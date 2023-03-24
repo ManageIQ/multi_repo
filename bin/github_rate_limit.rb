@@ -3,6 +3,6 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 
-puts [ManageIQ::Release.github.rate_limit.to_h].tableize
+puts [MultiRepo.github.rate_limit.to_h].tableize

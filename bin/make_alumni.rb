@@ -3,17 +3,17 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
   opt :users, "The users to make alumni.",     :type => :strings, :required => true
   opt :org,   "The org in which user belongs", :default => "ManageIQ"
 
-  ManageIQ::Release.common_options(self, :only => :dry_run)
+  MultiRepo.common_options(self, :only => :dry_run)
 end
 
-class ManageIQ::Release::MakeAlumni
+class MultiRepo::MakeAlumni
   attr_reader :org, :dry_run
 
   def initialize(org:, dry_run:, **_)
@@ -22,7 +22,7 @@ class ManageIQ::Release::MakeAlumni
   end
 
   def run(user)
-    progress = ManageIQ::Release.progress_bar(teams.size + repos.size)
+    progress = MultiRepo.progress_bar(teams.size + repos.size)
 
     add_team_membership("alumni", user)
     progress.increment
@@ -84,12 +84,12 @@ class ManageIQ::Release::MakeAlumni
   end
 
   def github
-    ManageIQ::Release.github
+    MultiRepo.github
   end
 end
 
-make_alumni = ManageIQ::Release::MakeAlumni.new(opts)
+make_alumni = MultiRepo::MakeAlumni.new(opts)
 opts[:users].each do |user|
-  puts ManageIQ::Release.header(user)
+  puts MultiRepo.header(user)
   make_alumni.run(user)
 end

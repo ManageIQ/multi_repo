@@ -3,13 +3,13 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
   opt :since, "Since what date.", :type => :string, :required => true
 
-  ManageIQ::Release.common_options(self, :except => :dry_run)
+  MultiRepo.common_options(self, :except => :dry_run)
 end
 
 class OrgStats
@@ -23,7 +23,7 @@ class OrgStats
   end
 
   def run
-    ManageIQ::Release.each_repo(**@opts) { |repo| run_one(repo) }
+    MultiRepo.each_repo(**@opts) { |repo| run_one(repo) }
 
     puts
     puts "Total Commits:"

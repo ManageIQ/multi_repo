@@ -3,11 +3,11 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
-  ManageIQ::Release.common_options(self, :only => :dry_run)
+  MultiRepo.common_options(self, :only => :dry_run)
 end
 
 def enable_repo(github, repo_name, workflow_url, workflow_id, dry_run: false, **_)
@@ -20,11 +20,11 @@ def enable_repo(github, repo_name, workflow_url, workflow_id, dry_run: false, **
   end
 end
 
-github = ManageIQ::Release.github
+github = MultiRepo.github
 
-repos = (ManageIQ::Release.github_repo_names_for("ManageIQ") << "ManageIQ/rbvmomi2").sort
+repos = (MultiRepo.github_repo_names_for("ManageIQ") << "ManageIQ/rbvmomi2").sort
 repos.each do |repo_name|
-  puts ManageIQ::Release.header(repo_name)
+  puts MultiRepo.header(repo_name)
 
   disabled_workflows = github.workflows(repo_name)[:workflows].select { |w| w.state == "disabled_inactivity" }
   if disabled_workflows.any?

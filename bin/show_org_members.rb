@@ -3,7 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
@@ -13,7 +13,7 @@ opts = Optimist.options do
 end
 
 def github
-  ManageIQ::Release.github
+  MultiRepo.github
 end
 
 def org_members(org:, **_)

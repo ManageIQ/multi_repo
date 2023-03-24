@@ -3,7 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
@@ -13,12 +13,12 @@ opts = Optimist.options do
   opt :message, "The commit message for this change.",                        :type => :string, :required => true
   opt :title,   "The PR title for this change. (default is --message)",       :type => :string
 
-  ManageIQ::Release.common_options(self)
+  MultiRepo.common_options(self)
 end
 
 results = {}
-ManageIQ::Release.each_repo(**opts) do |repo|
-  results[repo.github_repo] = ManageIQ::Release::PullRequestBlasterOuter.new(repo, **opts).blast
+MultiRepo.each_repo(**opts) do |repo|
+  results[repo.github_repo] = MultiRepo::PullRequestBlasterOuter.new(repo, **opts).blast
 end
 
 require 'pp'
