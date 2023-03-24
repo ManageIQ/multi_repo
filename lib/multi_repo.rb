@@ -124,19 +124,6 @@ module MultiRepo
   # Configuration
   #
 
-  def self.repo_options_file
-    config_dir.join("repo_options.yml")
-  end
-
-  def self.repo_options
-    @repo_options ||= begin
-      file = repo_options_file
-      repo_options = file.exist? ? YAML.unsafe_load_file(file) : {}
-      raise "repo_options.yml must contain a Hash" unless repo_options.kind_of?(Hash)
-      repo_options
-    end
-  end
-
   def self.config_files_for(prefix)
     Dir.glob(config_dir.join("#{prefix}*.yml")).sort
   end
@@ -146,6 +133,10 @@ module MultiRepo
       h.merge!(YAML.unsafe_load_file(f))
     end
   end
+
+  #
+  # Services
+  #
 
   def self.github_api_token
     @github_api_token ||= ENV["GITHUB_API_TOKEN"]
@@ -162,10 +153,6 @@ module MultiRepo
   def self.travis_api_token=(token)
     @travis_api_token = token
   end
-
-  #
-  # Services
-  #
 
   def self.github
     @github ||= begin

@@ -10,12 +10,12 @@ FileUtils.mkdir_p(MultiRepo.root_dir.join("config"))
 FileUtils.mkdir_p(MultiRepo.root_dir.join("repos"))
 
 def clear_repo_options_cache
-  MultiRepo.instance_variable_set(:@repo_options, nil)
+  MultiRepo::Repo.instance_variable_set(:@options, nil)
 end
 
 def stub_repo_options_file(file)
   clear_repo_options_cache
-  expect(MultiRepo).to receive(:repo_options_file).and_return(SPEC_DATA.join(file))
+  expect(MultiRepo::Repo).to receive(:options_file).at_least(:once).and_return(SPEC_DATA.join(file))
 end
 
 RSpec.configure do |config|

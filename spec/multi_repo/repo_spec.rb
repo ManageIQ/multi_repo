@@ -2,6 +2,29 @@ RSpec.describe MultiRepo::Repo do
   let(:repo_name) { "octocat/Hello-World" }
   subject { described_class.new(repo_name) }
 
+  describe ".options" do
+    before { clear_repo_options_cache }
+    after  { clear_repo_options_cache }
+
+    it "returns a Hash" do
+      stub_repo_options_file("repo_options.yml")
+
+      expect(described_class.options).to be_a(Hash)
+    end
+
+    it "handles a missing config file" do
+      stub_repo_options_file("repo_options_doesnt_exist.yml")
+
+      expect(described_class.options).to eq({})
+    end
+
+    it "only allows Hash in the config file" do
+      stub_repo_options_file("repo_options_invalid.yml")
+
+      expect { described_class.options }.to raise_error(RuntimeError, "#{described_class.options_file} must contain a Hash")
+    end
+  end
+
   it "#name" do
     expect(subject.name).to eq(repo_name)
   end

@@ -3,11 +3,24 @@ require 'ostruct'
 
 module MultiRepo
   class Repo
+    def self.options_file
+      MultiRepo.config_dir.join("repo_options.yml")
+    end
+
+    def self.options
+      @options ||= begin
+        file = options_file
+        options = file.exist? ? YAML.unsafe_load_file(file) : {}
+        raise "#{options_file} must contain a Hash" unless options.kind_of?(Hash)
+        options
+      end
+    end
+
     attr_reader :name, :options, :path
 
     def initialize(name)
       @name    = name
-      @options = OpenStruct.new(MultiRepo.repo_options.fetch(name, {}))
+      @options = OpenStruct.new(self.class.options.fetch(name, {}))
       @path    = MultiRepo.repos_dir.join(name)
     end
 
