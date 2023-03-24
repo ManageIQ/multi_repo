@@ -7,6 +7,7 @@ gem "activesupport",        :require => false
 gem "actionview",           :require => false
 gem "aws-sdk-s3",           :require => false
 gem "builder",              :require => false
+gem "colorize",             :require => false
 gem "config",               :require => false
 gem "licensee",             :require => false
 gem "manageiq-style",       :require => false
