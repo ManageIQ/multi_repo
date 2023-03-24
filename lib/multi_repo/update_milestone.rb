@@ -79,7 +79,7 @@ module ManageIQ
       end
 
       def github
-        ManageIQ::Release.github
+        MultiRepo.github
       end
     end
   end

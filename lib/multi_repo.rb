@@ -1,32 +1,32 @@
 require 'pathname'
 require 'pp'
 
-require 'manageiq/release/labels'
-require 'manageiq/release/repo'
-require 'manageiq/release/repo_set'
+require 'multi_repo/labels'
+require 'multi_repo/repo'
+require 'multi_repo/repo_set'
 
-require 'manageiq/release/code_climate'
-require 'manageiq/release/hakiri'
-require 'manageiq/release/license'
-require 'manageiq/release/readme_badges'
-require 'manageiq/release/travis'
+require 'multi_repo/code_climate'
+require 'multi_repo/hakiri'
+require 'multi_repo/license'
+require 'multi_repo/readme_badges'
+require 'multi_repo/travis'
 
-require 'manageiq/release/string_formatting'
+require 'multi_repo/string_formatting'
 
-require 'manageiq/release/backport_prs'
-require 'manageiq/release/destroy_tag'
-require 'manageiq/release/git_mirror'
-require 'manageiq/release/github'
-require 'manageiq/release/internationalization'
-require 'manageiq/release/pull_request_blaster_outer'
-require 'manageiq/release/release_branch'
-require 'manageiq/release/release_tag'
-require 'manageiq/release/rename_labels'
-require 'manageiq/release/rubygems_stub'
-require 'manageiq/release/update_branch_protection'
-require 'manageiq/release/update_labels'
-require 'manageiq/release/update_milestone'
-require 'manageiq/release/update_repo_settings'
+require 'multi_repo/backport_prs'
+require 'multi_repo/destroy_tag'
+require 'multi_repo/git_mirror'
+require 'multi_repo/github'
+require 'multi_repo/internationalization'
+require 'multi_repo/pull_request_blaster_outer'
+require 'multi_repo/release_branch'
+require 'multi_repo/release_tag'
+require 'multi_repo/rename_labels'
+require 'multi_repo/rubygems_stub'
+require 'multi_repo/update_branch_protection'
+require 'multi_repo/update_labels'
+require 'multi_repo/update_milestone'
+require 'multi_repo/update_repo_settings'
 
 module ManageIQ
   module Release
@@ -53,7 +53,7 @@ module ManageIQ
       if repo
         Array(repo).map { |n| repo_for(n) }
       else
-        ManageIQ::Release::RepoSet[repo_set]
+        MultiRepo::RepoSet[repo_set]
       end
     end
 
@@ -61,7 +61,7 @@ module ManageIQ
       Optimist.die(:repo, "must be specified") if repo.nil?
 
       org, repo_name = repo.split("/").unshift(nil).last(2)
-      ManageIQ::Release::Repo.new(repo_name, :org => org)
+      MultiRepo::Repo.new(repo_name, :org => org)
     end
 
     def self.common_options(optimist, only: %i[repo repo_set dry_run], except: nil, repo_set_default: "master")

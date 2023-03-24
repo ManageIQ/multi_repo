@@ -3,14 +3,14 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'more_core_extensions/core_ext/array/tableize'
 require 'optimist'
 
 opts = Optimist.options do
   opt :tag, "The tag name.", :type => :string, :required => true
 
-  ManageIQ::Release.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo.common_options(self, :except => :dry_run, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:tag].split("-").first unless opts[:repo] || opts[:repo_set]
 
@@ -28,6 +28,6 @@ def show_tag(repo, tag)
   [repo.name, sha, message]
 end
 
-repos = ManageIQ::Release.repos_for(**opts).reject { |repo| repo.options.has_real_releases }
+repos = MultiRepo.repos_for(**opts).reject { |repo| repo.options.has_real_releases }
 table = [HEADER] + repos.collect { |repo| show_tag(repo, opts[:tag]) }
 puts table.tableize(:max_width => 75)

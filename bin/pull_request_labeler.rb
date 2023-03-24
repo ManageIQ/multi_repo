@@ -3,7 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
@@ -11,7 +11,7 @@ opts = Optimist.options do
   opt :add,    "Labels to add",            :type => :strings, :required => true
   opt :remove, "Labels to remove",         :type => :strings, :required => true
 
-  ManageIQ::Release.common_options(self, :only => :dry_run)
+  MultiRepo.common_options(self, :only => :dry_run)
 end
 
 # TODO: Normalize any PR format (perhaps pull out of miq-bot or cross-repo-tests)
@@ -19,7 +19,7 @@ PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
 Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
 
 def github
-  ManageIQ::Release.github
+  MultiRepo.github
 end
 
 def add_labels(github_repo, pr_number, labels:, dry_run:, **_)
@@ -48,7 +48,7 @@ rescue Octokit::NotFound
 end
 
 opts[:prs].each do |pr|
-  puts ManageIQ::Release.header(pr)
+  puts MultiRepo.header(pr)
 
   github_repo, pr_number = PR_REGEX.match(pr).captures
 

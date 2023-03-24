@@ -24,9 +24,8 @@ module ManageIQ
       end
 
       private_class_method def self.github
-        ManageIQ::Release.github
+        MultiRepo.github
       end
     end
   end
 end
-

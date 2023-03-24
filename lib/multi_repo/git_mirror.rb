@@ -2,7 +2,7 @@ module ManageIQ
   module Release
     class GitMirror
       def initialize
-        require "manageiq/release/settings"
+        require "multi_repo/settings"
         StringFormatting.enable
 
         @errors_occurred = false

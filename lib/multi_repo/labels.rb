@@ -8,7 +8,7 @@ module ManageIQ
       def self.all
         @all ||= begin
           config["orgs"].each do |org, options|
-            ManageIQ::Release.github_repo_names_for(org).each do |repo_name|
+            MultiRepo.github_repo_names_for(org).each do |repo_name|
               next if config.key_path?("repos", repo_name)
               next if options["except"].include?(repo_name)
               config.store_path("repos", repo_name, options["labels"])
@@ -19,7 +19,7 @@ module ManageIQ
       end
 
       def self.config
-        @config ||= ManageIQ::Release.load_config_file("labels")
+        @config ||= MultiRepo.load_config_file("labels")
       end
     end
   end

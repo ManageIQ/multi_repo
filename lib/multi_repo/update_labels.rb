@@ -6,7 +6,7 @@ module ManageIQ
       def initialize(repo, dry_run: false, **_)
         @repo            = repo
         @dry_run         = dry_run
-        @expected_labels = ManageIQ::Release::Labels[repo]
+        @expected_labels = MultiRepo::Labels[repo]
       end
 
       def run
@@ -53,7 +53,7 @@ module ManageIQ
       end
 
       def github
-        ManageIQ::Release.github
+        MultiRepo.github
       end
     end
   end

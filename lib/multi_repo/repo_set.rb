@@ -16,7 +16,7 @@ module ManageIQ
       end
 
       def self.config
-        @config ||= ManageIQ::Release.load_config_file("repos")
+        @config ||= MultiRepo.load_config_file("repos")
       end
     end
   end

@@ -3,7 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 DISPLAY_FORMATS = %w[commit pr-title pr-label]
@@ -16,7 +16,7 @@ opts = Optimist.options do
 
   opt :skip,   "The repos to skip", :default => ["manageiq-documentation"]
 
-  ManageIQ::Release.common_options(self, :except => :dry_run)
+  MultiRepo.common_options(self, :except => :dry_run)
 end
 Optimist.die :display, "must be one of: #{DISPLAY_FORMATS.join(", ")}" unless DISPLAY_FORMATS.include?(opts[:display])
 
@@ -26,16 +26,16 @@ puts "Git commit log between #{opts[:from]} and #{opts[:to]}\n\n"
 
 repos_with_changes = []
 
-ManageIQ::Release.repos_for(**opts).each do |repo|
+MultiRepo.repos_for(**opts).each do |repo|
   next if repo.options.has_real_releases || repo.options.skip_tag
   next if opts[:skip].include?(repo.name)
 
-  puts ManageIQ::Release.header(repo.name)
+  puts MultiRepo.header(repo.name)
   repo.fetch(output: false)
 
   case opts[:display]
   when "pr-label", "pr-title"
-    github ||= ManageIQ::Release.github
+    github ||= MultiRepo.github
     pr_label_display = opts[:display] == "pr-label"
 
     results = {}

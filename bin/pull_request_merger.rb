@@ -3,7 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'manageiq/release'
+require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
@@ -11,7 +11,7 @@ opts = Optimist.options do
   opt :assignee, "GitHub user to assign when merging", :type => :string,  :required => true
   opt :labels,   "Labels to apply when merging",       :type => :strings
 
-  ManageIQ::Release.common_options(self)
+  MultiRepo.common_options(self)
 end
 
 # TODO: Normalize any PR format (perhaps pull out of miq-bot or cross-repo-tests)
@@ -23,7 +23,7 @@ def merge_pull_request(github_repo, pr_number, dry_run:, **_)
     puts "** dry-run: github.merge_pull_request(#{github_repo.inspect}, #{pr_number.inspect})"
   else
     begin
-      ManageIQ::Release.github.merge_pull_request(github_repo, pr_number)
+      MultiRepo.github.merge_pull_request(github_repo, pr_number)
     rescue Octokit::MethodNotAllowed => err
       raise unless err.to_s.include?("Pull Request is not mergeable")
 
@@ -37,7 +37,7 @@ def add_labels(github_repo, pr_number, labels:, dry_run:, **_)
   if dry_run
     puts "** dry_run: github.add_labels_to_an_issue(#{github_repo.inspect}, #{pr_number.inspect}, #{labels.inspect})"
   else
-    ManageIQ::Release.github.add_labels_to_an_issue(github_repo, pr_number, labels)
+    MultiRepo.github.add_labels_to_an_issue(github_repo, pr_number, labels)
   end
 end
 
@@ -46,12 +46,12 @@ def assign_user(github_repo, pr_number, assignee:, dry_run:, **_)
   if dry_run
     puts "** dry_run: github.update_issue(#{github_repo.inspect}, #{pr_number.inspect}, \"assignee\" => #{assignee.inspect})"
   else
-    ManageIQ::Release.github.update_issue(github_repo, pr_number, "assignee" => assignee)
+    MultiRepo.github.update_issue(github_repo, pr_number, "assignee" => assignee)
   end
 end
 
 opts[:prs].each do |pr|
-  puts ManageIQ::Release.header(pr)
+  puts MultiRepo.header(pr)
 
   github_repo, pr_number = PR_REGEX.match(pr).captures
 
