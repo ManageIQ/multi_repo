@@ -24,8 +24,29 @@ require 'multi_repo/update_milestone'
 require 'multi_repo/update_repo_settings'
 
 module MultiRepo
-  CONFIG_DIR = Pathname.new("../../config").expand_path(__dir__)
-  REPOS_DIR = Pathname.new("../../repos").expand_path(__dir__)
+  def self.root_dir
+    @root_dir ||= Pathname.new(Dir.pwd).expand_path
+  end
+
+  def self.root_dir=(dir)
+    @root_dir = Pathname.new(dir)
+  end
+
+  def self.config_dir
+    @config_dir ||= root_dir.join("config")
+  end
+
+  def self.config_dir=(dir)
+    @config_dir = Pathname.new(dir)
+  end
+
+  def self.repos_dir
+    @repos_dir ||= root_dir.join("repos")
+  end
+
+  def self.repos_dir=(dir)
+    @repos_dir = Pathname.new(dir)
+  end
 
   #
   # CLI helpers
@@ -112,7 +133,7 @@ module MultiRepo
   #
 
   def self.config_files_for(prefix)
-    Dir.glob(CONFIG_DIR.join("#{prefix}*.yml")).sort
+    Dir.glob(config_dir.join("#{prefix}*.yml")).sort
   end
 
   def self.load_config_file(prefix)

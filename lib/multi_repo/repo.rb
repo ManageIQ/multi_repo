@@ -8,7 +8,7 @@ module MultiRepo
     def initialize(name, options = nil)
       @name    = name
       @options = OpenStruct.new(options || {})
-      @path    = REPOS_DIR.join(github_repo)
+      @path    = MultiRepo.repos_dir.join(github_repo)
     end
 
     def chdir
