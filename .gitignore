@@ -2,5 +2,5 @@
 /config/
 /mirrors/
 /repos/
-/spec/repos/
+/spec/root/
 Gemfile.lock

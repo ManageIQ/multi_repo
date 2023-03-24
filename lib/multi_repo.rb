@@ -29,23 +29,15 @@ module MultiRepo
   end
 
   def self.root_dir=(dir)
-    @root_dir = Pathname.new(dir)
+    @root_dir = Pathname.new(dir).expand_path
   end
 
   def self.config_dir
     @config_dir ||= root_dir.join("config")
   end
 
-  def self.config_dir=(dir)
-    @config_dir = Pathname.new(dir)
-  end
-
   def self.repos_dir
     @repos_dir ||= root_dir.join("repos")
-  end
-
-  def self.repos_dir=(dir)
-    @repos_dir = Pathname.new(dir)
   end
 
   #
@@ -131,6 +123,19 @@ module MultiRepo
   #
   # Configuration
   #
+
+  def self.repo_options_file
+    config_dir.join("repo_options.yml")
+  end
+
+  def self.repo_options
+    @repo_options ||= begin
+      file = repo_options_file
+      repo_options = file.exist? ? YAML.unsafe_load_file(file) : {}
+      raise "repo_options.yml must contain a Hash" unless repo_options.kind_of?(Hash)
+      repo_options
+    end
+  end
 
   def self.config_files_for(prefix)
     Dir.glob(config_dir.join("#{prefix}*.yml")).sort

@@ -5,9 +5,9 @@ module MultiRepo
   class Repo
     attr_reader :name, :options, :path
 
-    def initialize(name, options = nil)
+    def initialize(name)
       @name    = name
-      @options = OpenStruct.new(options || {})
+      @options = OpenStruct.new(MultiRepo.repo_options.fetch(name, {}))
       @path    = MultiRepo.repos_dir.join(name)
     end
 

@@ -1,10 +1,22 @@
 require "multi_repo"
+require "pathname"
 
-# Prepare a clean directory for the repos
-REPOS_DIR = Pathname.new(__dir__).join("repos").expand_path
-MultiRepo.repos_dir = REPOS_DIR
-FileUtils.rm_rf(MultiRepo.repos_dir)
-FileUtils.mkdir_p(MultiRepo.repos_dir)
+SPEC_DATA = Pathname.new(__dir__).join("data").expand_path
+
+# Prepare a clean root directory
+MultiRepo.root_dir = Pathname.new(__dir__).join("root").expand_path
+FileUtils.rm_rf(MultiRepo.root_dir)
+FileUtils.mkdir_p(MultiRepo.root_dir.join("config"))
+FileUtils.mkdir_p(MultiRepo.root_dir.join("repos"))
+
+def clear_repo_options_cache
+  MultiRepo.instance_variable_set(:@repo_options, nil)
+end
+
+def stub_repo_options_file(file)
+  clear_repo_options_cache
+  expect(MultiRepo).to receive(:repo_options_file).and_return(SPEC_DATA.join(file))
+end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
