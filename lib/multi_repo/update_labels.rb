@@ -1,60 +1,58 @@
-module ManageIQ
-  module Release
-    class UpdateLabels
-      attr_reader :repo, :dry_run, :expected_labels
+module MultiRepo
+  class UpdateLabels
+    attr_reader :repo, :dry_run, :expected_labels
 
-      def initialize(repo, dry_run: false, **_)
-        @repo            = repo
-        @dry_run         = dry_run
-        @expected_labels = MultiRepo::Labels[repo]
+    def initialize(repo, dry_run: false, **_)
+      @repo            = repo
+      @dry_run         = dry_run
+      @expected_labels = MultiRepo::Labels[repo]
+    end
+
+    def run
+      if expected_labels.nil?
+        puts "** No labels defined for #{repo}"
+        return
       end
 
-      def run
-        if expected_labels.nil?
-          puts "** No labels defined for #{repo}"
-          return
-        end
+      expected_labels.each do |label, color|
+        github_label = existing_labels.detect { |l| l.name == label }
 
-        expected_labels.each do |label, color|
-          github_label = existing_labels.detect { |l| l.name == label }
-
-          if !github_label
-            create(label, color)
-          elsif github_label.color.downcase != color.downcase
-            update(label, color)
-          end
+        if !github_label
+          create(label, color)
+        elsif github_label.color.downcase != color.downcase
+          update(label, color)
         end
       end
+    end
 
-      private
+    private
 
-      def existing_labels
-        @existing_labels ||= github.labels(repo)
+    def existing_labels
+      @existing_labels ||= github.labels(repo)
+    end
+
+    def create(label, color)
+      puts "Creating #{label.inspect} with #{color.inspect}"
+
+      if dry_run
+        puts "** dry-run: github.add_label(#{repo.inspect}, #{label.inspect}, #{color.inspect})"
+      else
+        github.add_label(repo, label, color)
       end
+    end
 
-      def create(label, color)
-        puts "Creating #{label.inspect} with #{color.inspect}"
+    def update(label, color)
+      puts "Updating #{label.inspect} to #{color.inspect}"
 
-        if dry_run
-          puts "** dry-run: github.add_label(#{repo.inspect}, #{label.inspect}, #{color.inspect})"
-        else
-          github.add_label(repo, label, color)
-        end
+      if dry_run
+        puts "** dry-run: github.update_label(#{repo.inspect}, #{label.inspect}, :color => #{color.inspect})"
+      else
+        github.update_label(repo, label, :color => color)
       end
+    end
 
-      def update(label, color)
-        puts "Updating #{label.inspect} to #{color.inspect}"
-
-        if dry_run
-          puts "** dry-run: github.update_label(#{repo.inspect}, #{label.inspect}, :color => #{color.inspect})"
-        else
-          github.update_label(repo, label, :color => color)
-        end
-      end
-
-      def github
-        MultiRepo.github
-      end
+    def github
+      MultiRepo.github
     end
   end
 end

@@ -1,30 +1,28 @@
-module ManageIQ
-  module Release
-    class DestroyTag
-      attr_reader :repo, :tag
+module MultiRepo
+  class DestroyTag
+    attr_reader :repo, :tag
 
-      def initialize(repo, tag:, **_)
-        @repo = repo
-        @tag = tag
-      end
+    def initialize(repo, tag:, **_)
+      @repo = repo
+      @tag = tag
+    end
 
-      def run
-        repo.checkout("master")
-        destroy_tag
-        # TODO: Also remove anything that rake:release might have done like creating a commit
-      end
+    def run
+      repo.checkout("master")
+      destroy_tag
+      # TODO: Also remove anything that rake:release might have done like creating a commit
+    end
 
-      def post_review
-        "pushd #{repo.path}; OVERRIDE=true git push origin :#{tag}; popd"
-      end
+    def post_review
+      "pushd #{repo.path}; OVERRIDE=true git push origin :#{tag}; popd"
+    end
 
-      private
+    private
 
-      def destroy_tag
-        repo.git.tag({:delete => true}, tag)
-      rescue MiniGit::GitError
-        nil
-      end
+    def destroy_tag
+      repo.git.tag({:delete => true}, tag)
+    rescue MiniGit::GitError
+      nil
     end
   end
 end
