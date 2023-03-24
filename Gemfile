@@ -19,3 +19,7 @@ gem "psych", ">=3",         :require => false
 gem "rbnacl",               :require => false
 gem "rest-client",          :require => false
 gem "travis",               :require => false
+
+group :development do
+  gem "rspec", :require => false
+end

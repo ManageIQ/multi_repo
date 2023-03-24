@@ -8,19 +8,16 @@ module MultiRepo
     def initialize(name, options = nil)
       @name    = name
       @options = OpenStruct.new(options || {})
-      @path    = MultiRepo.repos_dir.join(github_repo)
+      @path    = MultiRepo.repos_dir.join(name)
     end
 
     def chdir
+      git # Ensures the clone exists
       Dir.chdir(path) { yield }
     end
 
-    def github_repo
-      if name.include?("/")
-        name
-      else
-        [options.org || "ManageIQ", name].join("/")
-      end
+    def short_name
+      name.split("/").last
     end
 
     def git
@@ -101,10 +98,15 @@ module MultiRepo
     private
 
     def git_clone
-      clone_source = options.clone_source || "git@github.com:#{github_repo}.git"
+      clone_source = options.clone_source || "git@github.com:#{name}.git"
       args = ["clone", clone_source, path]
-      puts "+ git #{args.join(" ")}" if ENV["GIT_DEBUG"]
-      raise MiniGit::GitError.new(args, $?) unless system("git #{args.join(" ")}")
+
+      require 'shellwords'
+      command = Shellwords.join(["git", *args])
+      command << " &>/dev/null" unless ENV["GIT_DEBUG"]
+      puts "+ #{command}" if ENV["GIT_DEBUG"]
+
+      raise MiniGit::GitError.new(args, $?) unless system(command)
     end
   end
 end
