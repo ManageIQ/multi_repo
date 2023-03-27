@@ -14,7 +14,7 @@ end
 opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
 
 MultiRepo.repos_for(**opts).each do |repo|
-  next if opts[:branch] != "master" && repo.options.has_real_releases
+  next if opts[:branch] != "master" && repo.config.has_real_releases
 
   puts MultiRepo.header(repo.name)
   MultiRepo::UpdateBranchProtection.new(repo.github_repo, **opts).run

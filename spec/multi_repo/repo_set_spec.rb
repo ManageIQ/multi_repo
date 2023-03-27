@@ -1,10 +1,10 @@
 RSpec.describe MultiRepo::RepoSet do
-  before { described_class.instance_variable_set(:@all, nil) }
-  after  { described_class.instance_variable_set(:@all, nil) }
+  before { %i[@config @all].each { |ivar| described_class.instance_variable_set(ivar, nil) } }
+  after  { %i[@config @all].each { |ivar| described_class.instance_variable_set(ivar, nil) } }
 
   describe ".all" do
     it "with a single repo set file" do
-      expect(described_class).to receive(:repo_set_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
+      expect(described_class).to receive(:config_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
 
       repo_sets = described_class.all
 
@@ -22,7 +22,7 @@ RSpec.describe MultiRepo::RepoSet do
     end
 
     it "with multiple repo set files" do
-      expect(described_class).to receive(:repo_set_files).and_return([SPEC_DATA.join("repo_set_many_1.yml"), SPEC_DATA.join("repo_set_many_2.yml")])
+      expect(described_class).to receive(:config_files).and_return([SPEC_DATA.join("repo_set_many_1.yml"), SPEC_DATA.join("repo_set_many_2.yml")])
 
       repo_sets = described_class.all
 
@@ -42,7 +42,7 @@ RSpec.describe MultiRepo::RepoSet do
 
   describe ".[]" do
     it "with a repo set that exists" do
-      expect(described_class).to receive(:repo_set_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
+      expect(described_class).to receive(:config_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
 
       repo_set = described_class.all["set1"]
 
@@ -54,7 +54,7 @@ RSpec.describe MultiRepo::RepoSet do
     end
 
     it "with a repo set that does not exist" do
-      expect(described_class).to receive(:repo_set_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
+      expect(described_class).to receive(:config_files).and_return([SPEC_DATA.join("repo_set_single.yml")])
 
       expect(described_class.all["invalid"]).to be_nil
     end

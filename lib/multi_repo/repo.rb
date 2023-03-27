@@ -3,25 +3,25 @@ require 'ostruct'
 
 module MultiRepo
   class Repo
-    def self.options_file
-      MultiRepo.config_dir.join("repo_options.yml")
+    def self.config_file
+      MultiRepo.config_dir.join("repos.yml")
     end
 
-    def self.options
-      @options ||= begin
-        file = options_file
-        options = file.exist? ? YAML.unsafe_load_file(file) : {}
-        raise "#{options_file} must contain a Hash" unless options.kind_of?(Hash)
-        options
+    def self.config
+      @config ||= begin
+        file = config_file
+        config = file.exist? ? YAML.unsafe_load_file(file) : {}
+        raise "#{config_file} must contain a Hash" unless config.kind_of?(Hash)
+        config
       end
     end
 
-    attr_reader :name, :options, :path
+    attr_reader :name, :config, :path
 
     def initialize(name)
-      @name    = name
-      @options = OpenStruct.new(self.class.options.fetch(name, {}))
-      @path    = MultiRepo.repos_dir.join(name)
+      @name   = name
+      @config = OpenStruct.new(self.class.config.fetch(name, {}))
+      @path   = MultiRepo.repos_dir.join(name)
     end
 
     def chdir
@@ -111,7 +111,7 @@ module MultiRepo
     private
 
     def git_clone
-      clone_source = options.clone_source || "git@github.com:#{name}.git"
+      clone_source = config.clone_source || "git@github.com:#{name}.git"
       args = ["clone", clone_source, path]
 
       require 'shellwords'

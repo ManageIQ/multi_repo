@@ -16,7 +16,7 @@ opts[:repo_set] = opts[:tag].split("-").first unless opts[:repo] || opts[:repo_s
 post_review = StringIO.new
 
 MultiRepo.each_repo(opts) do |repo|
-  next if repo.options.has_real_releases || repo.options.skip_tag
+  next if repo.config.has_real_releases || repo.config.skip_tag
 
   destroy_tag = MultiRepo::DestroyTag.new(repo, opts)
   destroy_tag.run

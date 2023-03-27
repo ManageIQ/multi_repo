@@ -27,7 +27,7 @@ puts "Git commit log between #{opts[:from]} and #{opts[:to]}\n\n"
 repos_with_changes = []
 
 MultiRepo.repos_for(**opts).each do |repo|
-  next if repo.options.has_real_releases || repo.options.skip_tag
+  next if repo.config.has_real_releases || repo.config.skip_tag
   next if opts[:skip].include?(repo.name)
 
   puts MultiRepo.header(repo.name)

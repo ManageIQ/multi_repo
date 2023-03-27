@@ -21,7 +21,7 @@ opts[:repo_set] = opts[:ref].split("-").first unless opts[:repo] || opts[:repo_s
 date_helper = Class.new { include ActionView::Helpers::DateHelper }.new
 
 travis_repos = MultiRepo.repos_for(**opts).collect do |repo|
-  next if repo.options.has_real_releases
+  next if repo.config.has_real_releases
 
   repo = Travis::Pro::Repository.find(repo.github_repo)
   begin
