@@ -11,7 +11,6 @@ require 'multi_repo/service/github'
 require 'multi_repo/service/rubygems_stub'
 require 'multi_repo/service/travis'
 
-require 'multi_repo/helpers/destroy_tag'
 require 'multi_repo/helpers/git_mirror'
 require 'multi_repo/helpers/license'
 require 'multi_repo/helpers/pull_request_blaster_outer'

@@ -21,26 +21,25 @@ module MultiRepo::Helpers
     end
 
     def blast
-      puts "+++ blasting #{repo.github_repo}..."
+      puts "+++ blasting #{repo.name}..."
 
-      repo.git
-      repo.fetch(output: false)
+      repo.git.fetch
 
-      unless repo.remote_branch?("origin", base)
-        puts "!!! Skipping #{repo.github_repo}: 'origin/#{base}' not found"
+      unless repo.git.remote_branch?("origin", base)
+        puts "!!! Skipping #{repo.name}: 'origin/#{base}' not found"
         return
       end
 
-      repo.checkout(head, "origin/#{base}")
+      repo.git.hard_checkout(head, "origin/#{base}")
       run_script
 
       result = false
       if !commit_changes
-        puts "!!! Failed to commit changes. Perhaps the script is wrong or #{repo.github_repo} is already updated."
+        puts "!!! Failed to commit changes. Perhaps the script is wrong or #{repo.name} is already updated."
       elsif dry_run
         result = "Committed but is dry run"
       else
-        puts "Do you want to open a pull request on #{repo.github_repo} with the above changes? (Y/N)"
+        puts "Do you want to open a pull request on #{repo.name} with the above changes? (Y/N)"
         answer = $stdin.gets.chomp
         if answer.upcase.start_with?("Y")
           fork_repo unless forked?
@@ -48,14 +47,14 @@ module MultiRepo::Helpers
           result = open_pull_request
         end
       end
-      puts "--- blasting #{repo.github_repo} complete"
+      puts "--- blasting #{repo.name} complete"
       result
     end
 
     private
 
     def github
-      MultiRepo.github
+      MultiRepo::Service::Github.client
     end
 
     def forked?
@@ -63,7 +62,7 @@ module MultiRepo::Helpers
     end
 
     def fork_repo
-      github.fork(repo.github_repo)
+      github.fork(repo.name)
       until forked?
         print "."
         sleep 3
@@ -73,7 +72,7 @@ module MultiRepo::Helpers
     def run_script
       repo.chdir do
         parts = []
-        parts << "GITHUB_REPO=#{repo.github_repo}"
+        parts << "GITHUB_REPO=#{repo.name}"
         parts << "DRY_RUN=true" if dry_run
         parts << script
         cmd = parts.join(" ")
@@ -88,9 +87,9 @@ module MultiRepo::Helpers
     def commit_changes
       repo.chdir do
         begin
-          repo.git.add("-v", ".")
-          repo.git.commit("-m", message)
-          repo.git.show
+          repo.git.client.add("-v", ".")
+          repo.git.client.commit("-m", message)
+          repo.git.client.show
           if dry_run
             puts "!!! --dry-run enabled: If the above commit in #{repo.path} looks good, run again without dry run to fork the repo, push the branch and open a pull request."
           end
@@ -115,13 +114,13 @@ module MultiRepo::Helpers
 
     def push_branch
       repo.chdir do
-        repo.git.remote("add", origin_remote, origin_url) unless repo.remote?(origin_remote)
-        repo.git.push("-f", origin_remote, "#{head}:#{head}")
+        repo.git.client.remote("add", origin_remote, origin_url) unless repo.git.remote?(origin_remote)
+        repo.git.client.push("-f", origin_remote, "#{head}:#{head}")
       end
     end
 
     def open_pull_request
-      pr = github.create_pull_request(repo.github_repo, base, pr_head, title, title)
+      pr = github.create_pull_request(repo.name, base, pr_head, title, title)
       pr.html_url
     rescue => err
       raise unless err.message.include?("A pull request already exists")

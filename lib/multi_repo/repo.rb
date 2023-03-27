@@ -24,7 +24,7 @@ module MultiRepo
     end
 
     def git
-      @git ||= MultiRepo::Service::Git.client(path: path, clone_source: config.clone_source || "git@github.com:#{name}.git")
+      @git ||= MultiRepo::Service::Git.new(path: path, clone_source: config.clone_source || "git@github.com:#{name}.git")
     end
 
     def chdir
@@ -34,41 +34,6 @@ module MultiRepo
 
     def short_name
       name.split("/").last
-    end
-
-    def fetch(output: true)
-      if output
-        git.fetch(:all => true, :tags => true)
-      else
-        git.capturing.fetch(:all => true, :tags => true)
-      end
-    end
-
-    def checkout(branch, source = "origin/#{branch}")
-      git.reset(:hard => true)
-      git.clean("-xdf")
-      git.checkout("-B", branch, source)
-    end
-
-    def branch?(branch)
-      git.rev_parse("--verify", branch)
-      true
-    rescue MiniGit::GitError
-      false
-    end
-
-    def remote?(remote)
-      begin
-        git.remote("show", remote)
-      rescue MiniGit::GitError => e
-        false
-      else
-        true
-      end
-    end
-
-    def remote_branch?(remote, branch)
-      git.capturing.ls_remote(remote, branch).present?
     end
 
     def write_file(file, content, dry_run: false, **kwargs)

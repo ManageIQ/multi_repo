@@ -20,8 +20,8 @@ module MultiRepo::Service
     def self.badge_details(repo)
       {
         "description" => badge_name,
-        "image"       => "https://codeclimate.com/github/#{repo.github_repo}.svg",
-        "url"         => "https://codeclimate.com/github/#{repo.github_repo}"
+        "image"       => "https://codeclimate.com/github/#{repo.name}.svg",
+        "url"         => "https://codeclimate.com/github/#{repo.name}"
       }
     end
 
@@ -32,8 +32,8 @@ module MultiRepo::Service
     def self.coverage_badge_details(repo)
       {
         "description" => coverage_badge_name,
-        "image"       => "https://codeclimate.com/github/#{repo.github_repo}/badges/coverage.svg",
-        "url"         => "https://codeclimate.com/github/#{repo.github_repo}/coverage"
+        "image"       => "https://codeclimate.com/github/#{repo.name}/badges/coverage.svg",
+        "url"         => "https://codeclimate.com/github/#{repo.name}/coverage"
       }
     end
 
@@ -67,7 +67,7 @@ module MultiRepo::Service
     end
 
     def create_repo_secret
-      Github.create_or_update_repository_secret(repo.github_repo, "CC_TEST_REPORTER_ID", test_reporter_id)
+      Github.create_or_update_repository_secret(repo.name, "CC_TEST_REPORTER_ID", test_reporter_id)
     end
 
     private
@@ -77,14 +77,14 @@ module MultiRepo::Service
 
       @response =
         if dry_run
-          puts "** dry-run: RestClient.get(\"https://api.codeclimate.com/v1/repos?github_slug=#{repo.github_repo}\", #{headers})"
+          puts "** dry-run: RestClient.get(\"https://api.codeclimate.com/v1/repos?github_slug=#{repo.name}\", #{headers})"
           {"data" => [{"attributes" => {"badge_token" => "0123456789abdef01234", "test_reporter_id" => "0123456789abcedef0123456789abcedef0123456789abcedef0123456789abc"}}]}
         else
-          JSON.parse(RestClient.get("https://api.codeclimate.com/v1/repos?github_slug=#{repo.github_repo}", headers))
+          JSON.parse(RestClient.get("https://api.codeclimate.com/v1/repos?github_slug=#{repo.name}", headers))
         end
 
       if @response["data"].empty?
-        payload = {"data" => {"type" => "repos", "attributes" => {"url" => "https://github.com/#{repo.github_repo}"}}}.to_json
+        payload = {"data" => {"type" => "repos", "attributes" => {"url" => "https://github.com/#{repo.name}"}}}.to_json
         @response = JSON.parse(RestClient.post("https://api.codeclimate.com/v1/github/repos", payload, headers))
         @response["data"] = [@response["data"]]
       end
