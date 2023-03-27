@@ -5,12 +5,9 @@ require File.join(Bundler::Plugin.index.load_paths("bundler-inject")[0], "bundle
 
 gem "activesupport",        :require => false
 gem "actionview",           :require => false
-gem "aws-sdk-s3",           :require => false
-gem "builder",              :require => false
 gem "colorize",             :require => false
 gem "config",               :require => false
 gem "licensee",             :require => false
-gem "manageiq-style",       :require => false
 gem "minigit",              :require => false
 gem "more_core_extensions", :require => false
 gem "octokit", ">=4.23.0",  :require => false
@@ -22,5 +19,6 @@ gem "rest-client",          :require => false
 gem "travis",               :require => false
 
 group :development do
-  gem "rspec", :require => false
+  gem "manageiq-style", :require => false
+  gem "rspec",          :require => false
 end
