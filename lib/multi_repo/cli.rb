@@ -6,7 +6,7 @@ module MultiRepo
       raise "no block given" unless block_given?
 
       repos_for(**kwargs).each do |repo|
-        puts header(repo.github_repo)
+        puts header(repo.name)
         yield repo
         puts
       end
@@ -22,11 +22,10 @@ module MultiRepo
       end
     end
 
-    def self.repo_for(repo)
-      Optimist.die(:repo, "must be specified") if repo.nil?
+    def self.repo_for(repo_name)
+      Optimist.die(:repo, "must be specified") if repo_name.nil?
 
-      org, repo_name = repo.split("/").unshift(nil).last(2)
-      MultiRepo::Repo.new(repo_name, :org => org)
+      MultiRepo::Repo.new(repo_name)
     end
 
     def self.common_options(optimist, only: %i[repo repo_set dry_run], except: nil, repo_set_default: "master")

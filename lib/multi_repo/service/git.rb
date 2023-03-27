@@ -51,7 +51,7 @@ module MultiRepo::Service
       client = output ? self.client : self.client.capturing
 
       if dry_run
-        puts "** dry-run: git tag --delete #{tag}".gray
+        puts "** dry-run: git tag --delete #{tag}".light_black
       else
         client.tag({:delete => true}, tag)
       end

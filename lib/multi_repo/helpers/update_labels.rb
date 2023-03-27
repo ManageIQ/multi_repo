@@ -1,16 +1,16 @@
 module MultiRepo::Helpers
   class UpdateLabels
-    attr_reader :repo, :dry_run, :expected_labels
+    attr_reader :repo_name, :expected_labels, :github
 
-    def initialize(repo, dry_run: false, **_)
-      @repo            = repo
-      @dry_run         = dry_run
-      @expected_labels = MultiRepo::Labels[repo]
+    def initialize(repo_name, dry_run: false)
+      @repo_name       = repo_name
+      @expected_labels = MultiRepo::Labels[repo_name]
+      @github          = MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
     def run
       if expected_labels.nil?
-        puts "** No labels defined for #{repo}"
+        puts "!! No labels defined for #{repo_name}"
         return
       end
 
@@ -18,41 +18,17 @@ module MultiRepo::Helpers
         github_label = existing_labels.detect { |l| l.name == label }
 
         if !github_label
-          create(label, color)
+          puts "Creating #{label.inspect} with #{color.inspect}"
+          github.create_label(repo_name, label, color)
         elsif github_label.color.downcase != color.downcase
-          update(label, color)
+          puts "Updating #{label.inspect} to #{color.inspect}"
+          github.update_label(repo_name, label, color)
         end
       end
     end
 
-    private
-
-    def existing_labels
-      @existing_labels ||= github.labels(repo)
-    end
-
-    def create(label, color)
-      puts "Creating #{label.inspect} with #{color.inspect}"
-
-      if dry_run
-        puts "** dry-run: github.add_label(#{repo.inspect}, #{label.inspect}, #{color.inspect})"
-      else
-        github.add_label(repo, label, color)
-      end
-    end
-
-    def update(label, color)
-      puts "Updating #{label.inspect} to #{color.inspect}"
-
-      if dry_run
-        puts "** dry-run: github.update_label(#{repo.inspect}, #{label.inspect}, :color => #{color.inspect})"
-      else
-        github.update_label(repo, label, :color => color)
-      end
-    end
-
-    def github
-      MultiRepo::Service::Github.client
+    private def existing_labels
+      @existing_labels ||= github.client.labels(repo_name)
     end
   end
 end

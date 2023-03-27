@@ -1,11 +1,11 @@
 module MultiRepo::Helpers
   class RenameLabels
-    attr_reader :repo, :rename_hash, :dry_run
+    attr_reader :repo_name, :rename_hash, :github
 
-    def initialize(repo, rename_hash, dry_run: false, **_)
-      @repo        = repo
+    def initialize(repo_name, rename_hash, dry_run: false)
+      @repo_name   = repo_name
       @rename_hash = rename_hash
-      @dry_run     = dry_run
+      @github      = MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
     def run
@@ -13,29 +13,14 @@ module MultiRepo::Helpers
         github_label = existing_labels.detect { |l| l.name == old_name }
 
         if github_label
-          update(old_name, new_name)
+          puts "Renaming label #{old_name.inspect} to #{new_name.inspect}"
+          github.update_label(repo_name, old_name, name: new_name)
         end
       end
     end
 
-    private
-
-    def existing_labels
-      @existing_labels ||= github.labels(repo)
-    end
-
-    def update(old_label, new_label)
-      puts "Renaming #{old_label.inspect} to #{new_label.inspect}"
-
-      if dry_run
-        puts "** dry-run: github.rename_label(#{repo.inspect}, #{old_label.inspect}, :name => #{new_label.inspect})"
-      else
-        github.update_label(repo, old_label, :name => new_label)
-      end
-    end
-
-    def github
-      MultiRepo::Service::Github.client
+    private def existing_labels
+      @existing_labels ||= github.labels(repo_name)
     end
   end
 end

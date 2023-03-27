@@ -1,84 +1,33 @@
-require "active_support/core_ext/time"
+
 
 module MultiRepo::Helpers
   class UpdateMilestone
-    def self.valid_date?(date)
-      !!parse_date(date)
-    end
+    attr_reader :repo_name, :title, :due_on, :close, :github
 
-    def self.parse_date(date)
-      ActiveSupport::TimeZone.new('Pacific Time (US & Canada)').parse(date) # LOL GitHub, TimeZones are hard
-    end
-
-    attr_reader :repo, :title, :due_on, :close, :dry_run
-
-    def initialize(repo, title:, due_on:, close:, dry_run:, **_)
+    def initialize(repo_name, title:, due_on:, close:, dry_run: false)
       raise ArgumentError, "due_on must be specified" if due_on.nil? && !close
 
-      @repo    = repo
-      @title   = title
-      @due_on  = self.class.parse_date(due_on) if due_on
-      @close   = close
-      @dry_run = dry_run
+      @repo_name = repo_name
+      @title     = title
+      @due_on    = MultiRepo::Service::Github.parse_milestone_date(due_on) if due_on
+      @close     = close
+      @github    = MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
     def run
-      return if repo.options.has_real_releases
-
-      existing = github.list_milestones(github_repo, :state => :all).detect { |m| m.title.casecmp?(title) }
+      existing = github.find_milestone_by_title(repo_name, title)
       if close
-        close_milestone(existing) if existing
+        if existing
+          puts "Closing milestone #{title.inspect} (#{existing.number})"
+          github.close_milestone(repo.name, title, existing.number)
+        end
       elsif existing
-        update_milestone(existing)
+        puts "Updating milestone #{title.inspect} (#{existing.number}) with due date #{due_on_str.inspect}"
+        github.update_milestone(repo.name, existing.number, due_on)
       else
-        create_milestone
+        puts "Creating milestone #{title.inspect} with due date #{due_on_str.inspect}"
+        github.create_milestone(repo.name, title, due_on)
       end
-    end
-
-    private
-
-    def due_on_str
-      due_on.strftime("%Y-%m-%d")
-    end
-
-    def update_milestone(existing)
-      milestone_number = existing.number
-      puts "Updating milestone #{title.inspect} (#{milestone_number}) with due date #{due_on_str.inspect}"
-
-      if dry_run
-        puts "** dry-run: github.update_milestone(#{github_repo.inspect}, #{milestone_number}, :due_on => #{due_on_str.inspect})"
-      else
-        github.update_milestone(github_repo, milestone_number, :due_on => due_on)
-      end
-    end
-
-    def create_milestone
-      puts "Creating milestone #{title.inspect} with due date #{due_on_str.inspect}"
-
-      if dry_run
-        puts "** dry-run: github.create_milestone(#{github_repo.inspect}, #{title.inspect}, :due_on => #{due_on_str.inspect})"
-      else
-        github.create_milestone(github_repo, title, :due_on => due_on)
-      end
-    end
-
-    def close_milestone(existing)
-      milestone_number = existing.number
-      puts "Closing milestone #{title.inspect} (#{milestone_number})"
-
-      if dry_run
-        puts "** dry-run: github.update_milestone(#{github_repo.inspect}, #{milestone_number}, :state => 'closed')"
-      else
-        github.update_milestone(github_repo, milestone_number, :state => "closed")
-      end
-    end
-
-    def github_repo
-      repo.github_repo
-    end
-
-    def github
-      MultiRepo::Service::Github.client
     end
   end
 end

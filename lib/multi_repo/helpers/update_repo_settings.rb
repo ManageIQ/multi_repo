@@ -1,21 +1,13 @@
 module MultiRepo::Helpers
   class UpdateRepoSettings
-    attr_reader :repo, :dry_run
+    attr_reader :repo_name, :github
 
-    def initialize(repo, dry_run: false, **_)
-      @repo    = repo
-      @dry_run = dry_run
+    def initialize(repo_name, dry_run: false)
+      @repo_name = repo_name
+      @github    = MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
     def run
-      edit_repository
-    end
-
-    private
-
-    def edit_repository
-      puts "Editing #{repo}"
-
       settings = {
         :has_wiki           => false,
         :has_projects       => false,
@@ -24,15 +16,8 @@ module MultiRepo::Helpers
         :allow_squash_merge => false,
       }
 
-      if dry_run
-        puts "** dry-run: github.edit_repository(#{repo.inspect}, #{settings.inspect[1..-2]})"
-      else
-        github.edit_repository(repo, settings)
-      end
-    end
-
-    def github
-      MultiRepo::Service::Github.client
+      puts "Editing #{repo_name}"
+      github.edit_repository(repo_name, settings)
     end
   end
 end

@@ -54,15 +54,15 @@ module MultiRepo::Helpers
     private
 
     def github
-      MultiRepo::Service::Github.client
+      @github ||= MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
     def forked?
-      github.repos(github.login).any? { |m| m.name == repo.name }
+      github.client.repos(github.client.login).any? { |m| m.name == repo.name }
     end
 
     def fork_repo
-      github.fork(repo.name)
+      github.client.fork(repo.name)
       until forked?
         print "."
         sleep 3
@@ -105,11 +105,11 @@ module MultiRepo::Helpers
     end
 
     def origin_url
-      "git@github.com:#{github.login}/#{repo.name}.git"
+      "git@github.com:#{github.client.login}/#{repo.name}.git"
     end
 
     def pr_head
-      "#{github.login}:#{head}"
+      "#{github.client.login}:#{head}"
     end
 
     def push_branch
@@ -120,7 +120,7 @@ module MultiRepo::Helpers
     end
 
     def open_pull_request
-      pr = github.create_pull_request(repo.name, base, pr_head, title, title)
+      pr = github.client.create_pull_request(repo.name, base, pr_head, title, title)
       pr.html_url
     rescue => err
       raise unless err.message.include?("A pull request already exists")
