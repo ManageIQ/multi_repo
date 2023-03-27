@@ -2,17 +2,23 @@ module MultiRepo
   class GitMirror
     def initialize
       require "colorize"
+      require "config"
+
       @errors_occurred = false
     end
 
+    def settings
+      @settings ||= Config.load_files(MultiRepo.config_dir.join("settings.yml").to_s, MultiRepo.config_dir.join("settings.local.yml").to_s)
+    end
+
     def mirror_all
-      Settings.git_mirror.repos_to_mirror.keys.each { |repo| mirror(repo) }
+      settings.git_mirror.repos_to_mirror.keys.each { |repo| mirror(repo) }
       !@errors_occurred
     end
 
     def mirror(repo)
       repo = repo.to_s
-      options = default_repo_options.dup.merge!(Settings.git_mirror.repos_to_mirror[repo].to_h)
+      options = default_repo_options.dup.merge!(settings.git_mirror.repos_to_mirror[repo].to_h)
       with_repo(repo, options) do
         send("mirror_#{options.remote_source}_repo", repo)
       end
@@ -26,11 +32,11 @@ module MultiRepo
     end
 
     def backup_remote_defined?
-      !!Settings.git_mirror.remotes.backup
+      !!settings.git_mirror.remotes.backup
     end
 
     def mirror_branches_for(repo)
-      Settings.git_mirror.branch_mirror_defaults.to_h.merge(Settings.git_mirror.branch_mirror_overrides[repo].to_h || {}).each_with_object({}) { |(k, v), h| h[k.to_s] = v }
+      settings.git_mirror.branch_mirror_defaults.to_h.merge(settings.git_mirror.branch_mirror_overrides[repo].to_h || {}).each_with_object({}) { |(k, v), h| h[k.to_s] = v }
     end
 
     def mirror_branches(repo, source_remote, dest_remote)
@@ -56,7 +62,7 @@ module MultiRepo
     end
 
     def downstream_repo_name(repo, options)
-      options.downstream_repo_name || repo.sub(/^manageiq/, Settings.git_mirror.productization_name)
+      options.downstream_repo_name || repo.sub(/^manageiq/, settings.git_mirror.productization_name)
     end
 
     def system(*args)
@@ -78,7 +84,7 @@ module MultiRepo
       repo_name = downstream_repo_name(repo, options)
       puts "\n==== Mirroring #{repo_name} ====".bold.cyan
 
-      working_dir = Settings.git_mirror.working_directory
+      working_dir = settings.git_mirror.working_directory
       FileUtils.mkdir_p(working_dir)
 
       path = "#{working_dir}/#{repo_name}"
@@ -99,19 +105,19 @@ module MultiRepo
     end
 
     def clone_repo(upstream_repo, downstream_repo, path, remote_source)
-      upstream_remote = Settings.git_mirror.remotes[remote_source]
+      upstream_remote = settings.git_mirror.remotes[remote_source]
       raise "remote '#{remote_source}'' not found in settings" if upstream_remote.nil?
 
       system("git clone #{upstream_remote}/#{upstream_repo}.git #{path} -o upstream")
       Dir.chdir(path) do
         unless remote_exists?("downstream")
-          downstream_remote = Settings.git_mirror.remotes.downstream
+          downstream_remote = settings.git_mirror.remotes.downstream
           raise "remote 'downstream' not found in settings" if downstream_remote.nil?
 
           system("git remote add downstream #{downstream_remote}/#{downstream_repo}.git")
         end
         if backup_remote_defined? && !remote_exists?("backup")
-          backup_remote = Settings.git_mirror.remotes.backup
+          backup_remote = settings.git_mirror.remotes.backup
           system("git remote add backup #{backup_remote}/#{downstream_repo}.git")
         end
       end
