@@ -19,7 +19,7 @@ def delete(repo, label, dry_run:, **_)
   if dry_run
     puts "** dry-run: github.delete_label!(#{repo.inspect}, #{label.inspect})"
   else
-    MultiRepo.github.delete_label!(repo, label)
+    MultiRepo::Service::Github.client.delete_label!(repo, label)
   end
 end
 

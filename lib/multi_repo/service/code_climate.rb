@@ -3,7 +3,7 @@ require 'json'
 require 'more_core_extensions/core_ext/array'
 require 'more_core_extensions/core_ext/hash'
 
-module MultiRepo
+module MultiRepo::Service
   class CodeClimate
     def self.api_token
       @api_token ||= ENV["CODECLIMATE_API_TOKEN"]

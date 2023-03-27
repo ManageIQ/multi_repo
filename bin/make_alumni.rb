@@ -84,7 +84,7 @@ class MultiRepo::MakeAlumni
   end
 
   def github
-    MultiRepo.github
+    MultiRepo::Service::Github.client
   end
 end
 

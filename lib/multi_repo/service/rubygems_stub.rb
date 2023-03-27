@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Service
   class RubygemsStub
     attr_reader :repo, :owners, :dry_run
 

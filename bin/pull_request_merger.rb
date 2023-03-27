@@ -23,7 +23,7 @@ def merge_pull_request(github_repo, pr_number, dry_run:, **_)
     puts "** dry-run: github.merge_pull_request(#{github_repo.inspect}, #{pr_number.inspect})"
   else
     begin
-      MultiRepo.github.merge_pull_request(github_repo, pr_number)
+      MultiRepo::Service::Github.client.merge_pull_request(github_repo, pr_number)
     rescue Octokit::MethodNotAllowed => err
       raise unless err.to_s.include?("Pull Request is not mergeable")
 
@@ -37,7 +37,7 @@ def add_labels(github_repo, pr_number, labels:, dry_run:, **_)
   if dry_run
     puts "** dry_run: github.add_labels_to_an_issue(#{github_repo.inspect}, #{pr_number.inspect}, #{labels.inspect})"
   else
-    MultiRepo.github.add_labels_to_an_issue(github_repo, pr_number, labels)
+    MultiRepo::Service::Github.client.add_labels_to_an_issue(github_repo, pr_number, labels)
   end
 end
 
@@ -46,7 +46,7 @@ def assign_user(github_repo, pr_number, assignee:, dry_run:, **_)
   if dry_run
     puts "** dry_run: github.update_issue(#{github_repo.inspect}, #{pr_number.inspect}, \"assignee\" => #{assignee.inspect})"
   else
-    MultiRepo.github.update_issue(github_repo, pr_number, "assignee" => assignee)
+    MultiRepo::Service::Github.client.update_issue(github_repo, pr_number, "assignee" => assignee)
   end
 end
 

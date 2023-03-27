@@ -125,11 +125,11 @@ class MultiRepo::Hacktoberfest
   end
 
   def org_repos
-    MultiRepo.github_repo_names_for("ManageIQ")
+    MultiRepo::Service::Github.client_repo_names_for("ManageIQ")
   end
 
   def github
-    MultiRepo.github
+    MultiRepo::Service::Github.client
   end
 end
 

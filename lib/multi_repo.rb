@@ -5,10 +5,10 @@ require 'multi_repo/labels'
 require 'multi_repo/repo'
 require 'multi_repo/repo_set'
 
-require 'multi_repo/code_climate'
-require 'multi_repo/github'
-require 'multi_repo/rubygems_stub'
-require 'multi_repo/travis'
+require 'multi_repo/service/code_climate'
+require 'multi_repo/service/github'
+require 'multi_repo/service/rubygems_stub'
+require 'multi_repo/service/travis'
 
 require 'multi_repo/license'
 require 'multi_repo/readme_badges'
@@ -130,60 +130,6 @@ module MultiRepo
   def self.load_config_file(prefix)
     config_files_for(prefix).each_with_object({}) do |f, h|
       h.merge!(YAML.unsafe_load_file(f))
-    end
-  end
-
-  #
-  # Services
-  #
-
-  def self.github_api_token
-    @github_api_token ||= ENV["GITHUB_API_TOKEN"]
-  end
-
-  def self.github_api_token=(token)
-    @github_api_token = token
-  end
-
-  def self.travis_api_token
-    @travis_api_token ||= ENV["TRAVIS_API_TOKEN"]
-  end
-
-  def self.travis_api_token=(token)
-    @travis_api_token = token
-  end
-
-  def self.github
-    @github ||= begin
-      raise "Missing GitHub API Token" if github_api_token.nil?
-
-      params = {
-        :access_token  => github_api_token,
-        :auto_paginate => true
-      }
-      params[:api_endpoint] = ENV["GITHUB_API_ENDPOINT"] if ENV["GITHUB_API_ENDPOINT"]
-
-      require 'octokit'
-      Octokit::Client.new(params)
-    end
-  end
-
-  def self.github_repo_names_for(org)
-    github
-      .list_repositories(org, :type => "sources")
-      .reject { |r| r.fork? || r.archived? }
-      .map { |r| "#{org}/#{r.name}" }
-  end
-
-  def self.travis
-    @travis ||= begin
-      raise "Missing Travis API Token" if travis_api_token.nil?
-
-      require 'travis/client'
-      ::Travis::Client.new(
-        :uri           => ::Travis::Client::COM_URI,
-        :access_token  => travis_api_token
-      )
     end
   end
 end

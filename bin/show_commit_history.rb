@@ -35,7 +35,7 @@ MultiRepo.repos_for(**opts).each do |repo|
 
   case opts[:display]
   when "pr-label", "pr-title"
-    github ||= MultiRepo.github
+    github ||= MultiRepo::Service::Github.client
     pr_label_display = opts[:display] == "pr-label"
 
     results = {}

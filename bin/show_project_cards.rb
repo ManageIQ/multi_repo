@@ -13,7 +13,7 @@ opts = Optimist.options do
   MultiRepo.common_options(self, :only => :repo)
 end
 
-github = MultiRepo.github
+github = MultiRepo::Service::Github.client
 repo = opts[:repo].first
 projects_headers = {:accept => "application/vnd.github.inertia-preview+json"}
 

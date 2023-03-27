@@ -1,7 +1,27 @@
 require 'yaml'
 
-module MultiRepo
+module MultiRepo::Service
   class Travis
+    def self.api_token
+      @api_token ||= ENV["TRAVIS_API_TOKEN"]
+    end
+
+    def self.api_token=(token)
+      @api_token = token
+    end
+
+    def self.client
+      @client ||= begin
+        raise "Missing Travis API Token" if travis_api_token.nil?
+
+        require 'travis/client'
+        ::Travis::Client.new(
+          :uri           => ::Travis::Client::COM_URI,
+          :access_token  => api_token
+        )
+      end
+    end
+
     def self.badge_name
       "Build Status"
     end
@@ -9,8 +29,8 @@ module MultiRepo
     def self.badge_details(repo, branch)
       {
         "description" => badge_name,
-        "image"       => "https://travis-ci.com/#{repo.github_repo}.svg?branch=#{branch}",
-        "url"         => "https://travis-ci.com/#{repo.github_repo}"
+        "image"       => "https://travis-ci.com/#{repo.name}.svg?branch=#{branch}",
+        "url"         => "https://travis-ci.com/#{repo.name}"
       }
     end
 

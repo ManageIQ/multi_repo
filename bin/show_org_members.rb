@@ -13,7 +13,7 @@ opts = Optimist.options do
 end
 
 def github
-  MultiRepo.github
+  MultiRepo::Service::Github.client
 end
 
 def org_members(org:, **_)

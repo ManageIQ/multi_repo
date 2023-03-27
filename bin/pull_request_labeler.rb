@@ -19,7 +19,7 @@ PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
 Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
 
 def github
-  MultiRepo.github
+  MultiRepo::Service::Github.client
 end
 
 def add_labels(github_repo, pr_number, labels:, dry_run:, **_)

@@ -32,7 +32,7 @@ module MultiRepo
     end
 
     def github
-      MultiRepo.github
+      MultiRepo::Service::Github.client
     end
   end
 end

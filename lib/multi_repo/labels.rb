@@ -7,7 +7,7 @@ module MultiRepo
     def self.all
       @all ||= begin
         config["orgs"].each do |org, options|
-          MultiRepo.github_repo_names_for(org).each do |repo_name|
+          MultiRepo::Service::Github.repo_names_for(org).each do |repo_name|
             next if config.key_path?("repos", repo_name)
             next if options["except"].include?(repo_name)
             config.store_path("repos", repo_name, options["labels"])

@@ -20,9 +20,9 @@ def enable_repo(github, repo_name, workflow_url, workflow_id, dry_run: false, **
   end
 end
 
-github = MultiRepo.github
+github = MultiRepo::Service::Github.client
 
-repos = (MultiRepo.github_repo_names_for("ManageIQ") << "ManageIQ/rbvmomi2").sort
+repos = (MultiRepo::Service::Github.client_repo_names_for("ManageIQ") << "ManageIQ/rbvmomi2").sort
 repos.each do |repo_name|
   puts MultiRepo.header(repo_name)
 
