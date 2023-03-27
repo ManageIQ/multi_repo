@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class GitMirror
     def initialize
       require "colorize"

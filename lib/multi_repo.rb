@@ -10,17 +10,16 @@ require 'multi_repo/service/github'
 require 'multi_repo/service/rubygems_stub'
 require 'multi_repo/service/travis'
 
-require 'multi_repo/license'
-require 'multi_repo/readme_badges'
-
-require 'multi_repo/destroy_tag'
-require 'multi_repo/git_mirror'
-require 'multi_repo/pull_request_blaster_outer'
-require 'multi_repo/rename_labels'
-require 'multi_repo/update_branch_protection'
-require 'multi_repo/update_labels'
-require 'multi_repo/update_milestone'
-require 'multi_repo/update_repo_settings'
+require 'multi_repo/helpers/destroy_tag'
+require 'multi_repo/helpers/git_mirror'
+require 'multi_repo/helpers/license'
+require 'multi_repo/helpers/pull_request_blaster_outer'
+require 'multi_repo/helpers/readme_badges'
+require 'multi_repo/helpers/rename_labels'
+require 'multi_repo/helpers/update_branch_protection'
+require 'multi_repo/helpers/update_labels'
+require 'multi_repo/helpers/update_milestone'
+require 'multi_repo/helpers/update_repo_settings'
 
 module MultiRepo
   def self.root_dir

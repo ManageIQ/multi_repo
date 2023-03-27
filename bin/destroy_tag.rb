@@ -18,7 +18,7 @@ post_review = StringIO.new
 MultiRepo.each_repo(opts) do |repo|
   next if repo.config.has_real_releases || repo.config.skip_tag
 
-  destroy_tag = MultiRepo::DestroyTag.new(repo, opts)
+  destroy_tag = MultiRepo::Helpers::DestroyTag.new(repo, opts)
   destroy_tag.run
   post_review.puts(destroy_tag.post_review)
 end

@@ -1,6 +1,6 @@
 require 'pathname'
 
-module MultiRepo
+module MultiRepo::Helpers
   class PullRequestBlasterOuter
     attr_reader :repo, :base, :head, :script, :dry_run, :message, :title
 

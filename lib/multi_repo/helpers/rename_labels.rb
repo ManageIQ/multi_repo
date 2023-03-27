@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class RenameLabels
     attr_reader :repo, :rename_hash, :dry_run
 

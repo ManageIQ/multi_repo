@@ -11,7 +11,7 @@ opts = Optimist.options do
 
   MultiRepo.common_options(self, :repo_set_default => nil)
 end
-opts[:repo] = MultiRepo::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]
+opts[:repo] = MultiRepo::Helpers::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]
 
 def delete(repo, label, dry_run:, **_)
   puts "Deleting #{label.inspect}"

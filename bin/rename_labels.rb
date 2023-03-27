@@ -19,5 +19,5 @@ puts "Renaming: #{rename_hash.pretty_inspect}"
 puts
 
 MultiRepo.each_repo(opts) do |repo|
-  MultiRepo::RenameLabels.new(repo.github_repo, rename_hash, opts).run
+  MultiRepo::Helpers::RenameLabels.new(repo.github_repo, rename_hash, opts).run
 end

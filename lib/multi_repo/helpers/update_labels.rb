@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class UpdateLabels
     attr_reader :repo, :dry_run, :expected_labels
 

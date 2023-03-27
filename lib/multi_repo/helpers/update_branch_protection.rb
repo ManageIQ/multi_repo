@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class UpdateBranchProtection
     attr_reader :repo, :branch, :dry_run
 

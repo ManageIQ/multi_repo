@@ -1,6 +1,6 @@
 require "active_support/core_ext/time"
 
-module MultiRepo
+module MultiRepo::Helpers
   class UpdateMilestone
     def self.valid_date?(date)
       !!parse_date(date)

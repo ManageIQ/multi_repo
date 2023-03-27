@@ -18,7 +18,7 @@ end
 
 results = {}
 MultiRepo.each_repo(**opts) do |repo|
-  results[repo.github_repo] = MultiRepo::PullRequestBlasterOuter.new(repo, **opts).blast
+  results[repo.github_repo] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
 end
 
 require 'pp'

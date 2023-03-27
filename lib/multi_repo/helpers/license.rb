@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class License
     attr_reader :repo, :dry_run
 

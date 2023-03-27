@@ -1,6 +1,6 @@
 require "active_support/core_ext/object/deep_dup"
 
-module MultiRepo
+module MultiRepo::Helpers
   class ReadmeBadges
     attr_reader :repo, :dry_run
     attr_accessor :badges

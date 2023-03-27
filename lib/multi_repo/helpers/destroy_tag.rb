@@ -1,4 +1,4 @@
-module MultiRepo
+module MultiRepo::Helpers
   class DestroyTag
     attr_reader :repo, :tag
 
