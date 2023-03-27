@@ -10,8 +10,6 @@ require 'multi_repo/license'
 require 'multi_repo/readme_badges'
 require 'multi_repo/travis'
 
-require 'multi_repo/string_formatting'
-
 require 'multi_repo/destroy_tag'
 require 'multi_repo/git_mirror'
 require 'multi_repo/github'

@@ -1,9 +1,7 @@
 module MultiRepo
   class GitMirror
     def initialize
-      require "multi_repo/settings"
-      StringFormatting.enable
-
+      require "colorize"
       @errors_occurred = false
     end
 

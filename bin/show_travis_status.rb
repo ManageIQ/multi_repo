@@ -9,6 +9,7 @@ require 'action_view' # For ActionView::Helpers::DateHelper
 require 'travis'
 require 'travis/pro/auto_login'
 require 'optimist'
+require 'colorize'
 
 opts = Optimist.options do
   opt :ref, "The branch or release tag to check status for.", :type => :string, :required => true
@@ -16,8 +17,6 @@ opts = Optimist.options do
   MultiRepo.common_options(self, :except => :dry_run, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:ref].split("-").first unless opts[:repo] || opts[:repo_set]
-
-MultiRepo::StringFormatting.enable
 
 date_helper = Class.new { include ActionView::Helpers::DateHelper }.new
 
