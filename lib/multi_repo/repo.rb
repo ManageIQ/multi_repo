@@ -1,4 +1,3 @@
-require 'minigit'
 require 'ostruct'
 
 module MultiRepo
@@ -24,6 +23,10 @@ module MultiRepo
       @path   = MultiRepo.repos_dir.join(name)
     end
 
+    def git
+      @git ||= MultiRepo::Service::Git.client(path: path, clone_source: config.clone_source || "git@github.com:#{name}.git")
+    end
+
     def chdir
       git # Ensures the clone exists
       Dir.chdir(path) { yield }
@@ -31,21 +34,6 @@ module MultiRepo
 
     def short_name
       name.split("/").last
-    end
-
-    def git
-      @git ||= begin
-        retried = false
-        MiniGit.debug = true if ENV["GIT_DEBUG"]
-        MiniGit.new(path)
-      end
-    rescue ArgumentError => err
-      raise if retried
-      raise unless err.message.include?("does not seem to exist")
-
-      git_clone
-      retried = true
-      retry
     end
 
     def fetch(output: true)
@@ -106,20 +94,6 @@ module MultiRepo
           File.exist?(f)
         end
       end
-    end
-
-    private
-
-    def git_clone
-      clone_source = config.clone_source || "git@github.com:#{name}.git"
-      args = ["clone", clone_source, path]
-
-      require 'shellwords'
-      command = Shellwords.join(["git", *args])
-      command << " &>/dev/null" unless ENV["GIT_DEBUG"]
-      puts "+ #{command}" if ENV["GIT_DEBUG"]
-
-      raise MiniGit::GitError.new(args, $?) unless system(command)
     end
   end
 end

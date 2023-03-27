@@ -6,6 +6,7 @@ require 'multi_repo/repo'
 require 'multi_repo/repo_set'
 
 require 'multi_repo/service/code_climate'
+require 'multi_repo/service/git'
 require 'multi_repo/service/github'
 require 'multi_repo/service/rubygems_stub'
 require 'multi_repo/service/travis'
