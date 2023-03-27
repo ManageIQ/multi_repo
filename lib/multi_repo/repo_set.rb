@@ -1,21 +1,22 @@
 require 'yaml'
-require 'active_support/core_ext/enumerable'
 
 module MultiRepo
   class RepoSet
+    def self.repo_set_files
+      Dir.glob(config_dir.join("repo_set*.yml")).sort
+    end
+
     def self.[](set_name)
       all[set_name]
     end
 
     def self.all
       @all ||=
-        config.each_with_object({}) do |(set_name, repos), h|
-          h[set_name] = repos.map { |name, options| Repo.new(name, options) }
+        repo_set_files.each_with_object({}) do |f, h|
+          YAML.unsafe_load_file(f).each do |set_name, repos|
+            h[set_name] = Array(repos).map { |r| Repo.new(r) }
+          end
         end
-    end
-
-    def self.config
-      @config ||= MultiRepo.load_config_file("repos")
     end
   end
 end
