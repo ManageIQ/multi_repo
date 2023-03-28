@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{MultiRepo is a library for managing multiple repositiories and running scripts against them.}
   spec.summary       = spec.description
   spec.homepage      = "http://github.com/ManageIQ/multi_repo"
-  spec.license       = "Apache-2.0"
+  spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
