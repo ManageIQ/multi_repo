@@ -3,17 +3,16 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :branch, "The branch to protect.", :type => :string, :required => true
 
-  MultiRepo.common_options(self, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
 
-MultiRepo.repos_for(**opts).each do |repo|
+MultiRepo::CLI.repos_for(**opts).each do |repo|
   next if opts[:branch] != "master" && repo.config.has_real_releases
 
   puts MultiRepo.header(repo.name)

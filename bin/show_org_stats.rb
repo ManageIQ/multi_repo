@@ -3,13 +3,12 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :since, "Since what date.", :type => :string, :required => true
 
-  MultiRepo.common_options(self, :except => :dry_run)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 
 class OrgStats

@@ -3,13 +3,12 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :labels, "The labels to delete.", :type => :strings, :required => true
 
-  MultiRepo.common_options(self, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :repo_set_default => nil)
 end
 opts[:repo] = MultiRepo::Helpers::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]
 

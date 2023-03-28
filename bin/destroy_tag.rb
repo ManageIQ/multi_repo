@@ -3,13 +3,12 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :tag, "The tag to destroy", :type => :string, :required => true
 
-  MultiRepo.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:tag].split("-").first unless opts[:repo] || opts[:repo_set]
 

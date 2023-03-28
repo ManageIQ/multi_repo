@@ -3,14 +3,13 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :branch,   "The branch to fetch.",                   :type => :string,  :required => true
   opt :checkout, "Checkout target branch after fetching.", :type => :boolean, :default => false
 
-  MultiRepo.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
 

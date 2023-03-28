@@ -3,15 +3,14 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :apply, "Apply the `hacktoberfest` label to `good first issue` labels. "\
               "Pass --no-apply to remove the `hacktoberfest` label",
               :type => :boolean, :default => true
 
-  MultiRepo.common_options(self, :only => :dry_run)
+  MultiRepo::CLI.common_options(self, :only => :dry_run)
 end
 
 class MultiRepo::Hacktoberfest

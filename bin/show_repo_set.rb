@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH << File.expand_path("../lib", __dir__)
-
-require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
-
-opts = Optimist.options do
-  MultiRepo.common_options(self, :only => :repo_set)
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
 end
 
-puts MultiRepo.repos_for(**opts).collect(&:name)
+opts = Optimist.options do
+  MultiRepo::CLI.common_options(self, :only => :repo_set)
+end
+
+puts MultiRepo::CLI.repos_for(**opts).collect(&:name)

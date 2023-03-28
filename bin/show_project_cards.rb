@@ -3,14 +3,13 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :project_id, "The project ID",                :type => :integer, :required => true
   opt :column,     "The column within the project", :type => :string,  :required => true
 
-  MultiRepo.common_options(self, :only => :repo)
+  MultiRepo::CLI.common_options(self, :only => :repo)
 end
 
 github = MultiRepo::Service::Github.client

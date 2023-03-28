@@ -3,15 +3,14 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :prs,    "The list of PRs to merge", :type => :strings, :required => true
   opt :add,    "Labels to add",            :type => :strings, :required => true
   opt :remove, "Labels to remove",         :type => :strings, :required => true
 
-  MultiRepo.common_options(self, :only => :dry_run)
+  MultiRepo::CLI.common_options(self, :only => :dry_run)
 end
 
 # TODO: Normalize any PR format (perhaps pull out of miq-bot or cross-repo-tests)

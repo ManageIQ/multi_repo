@@ -3,21 +3,20 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
+require "multi_repo/cli"
 require 'travis'
 require 'travis/pro/auto_login'
-require 'optimist'
 
 opts = Optimist.options do
   opt :ref, "The branch or release tag to rebuild.", :type => :string, :required => true
 
-  MultiRepo.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)
 end
 opts[:repo_set] = opts[:ref].split("-").first unless opts[:repo] || opts[:repo_set]
 
 puts "Restarting Travis builds for #{opts[:ref]}:"
 
-MultiRepo.repos_for(**opts).collect do |repo|
+MultiRepo::CLI.repos_for(**opts).collect do |repo|
   next if repo.config.has_real_releases
 
   repo = Travis::Pro::Repository.find(repo.github_repo)

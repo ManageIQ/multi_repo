@@ -3,8 +3,7 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 DISPLAY_FORMATS = %w[commit pr-title pr-label]
 
@@ -16,7 +15,7 @@ opts = Optimist.options do
 
   opt :skip,   "The repos to skip", :default => ["manageiq-documentation"]
 
-  MultiRepo.common_options(self, :except => :dry_run)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 Optimist.die :display, "must be one of: #{DISPLAY_FORMATS.join(", ")}" unless DISPLAY_FORMATS.include?(opts[:display])
 
@@ -26,7 +25,7 @@ puts "Git commit log between #{opts[:from]} and #{opts[:to]}\n\n"
 
 repos_with_changes = []
 
-MultiRepo.repos_for(**opts).each do |repo|
+MultiRepo::CLI.repos_for(**opts).each do |repo|
   next if repo.config.has_real_releases || repo.config.skip_tag
   next if opts[:skip].include?(repo.name)
 

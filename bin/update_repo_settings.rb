@@ -3,11 +3,10 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
-  MultiRepo.common_options(self)
+  MultiRepo::CLI.common_options(self)
 end
 
 MultiRepo.each_repo(opts) do |repo|

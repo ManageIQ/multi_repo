@@ -3,13 +3,12 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :branch, "The branch to destroy.", :type => :string, :required => true
 
-  MultiRepo.common_options(self, :except => :dry_run)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 
 MultiRepo.each_repo(opts) do |repo|

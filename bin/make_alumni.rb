@@ -3,14 +3,13 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :users, "The users to make alumni.",     :type => :strings, :required => true
   opt :org,   "The org in which user belongs", :default => "ManageIQ"
 
-  MultiRepo.common_options(self, :only => :dry_run)
+  MultiRepo::CLI.common_options(self, :only => :dry_run)
 end
 
 class MultiRepo::MakeAlumni

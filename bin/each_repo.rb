@@ -3,14 +3,13 @@
 $LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require 'bundler/setup'
-require 'multi_repo'
-require 'optimist'
+require "multi_repo/cli"
 
 opts = Optimist.options do
   opt :command, "A command to run in each repo", :type => :string, :required => true
   opt :ref, "Ref to checkout before running the command", :type => :string, :default => "master"
 
-  MultiRepo.common_options(self, :except => :dry_run)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 
 MultiRepo.each_repo(**opts) do |r|
