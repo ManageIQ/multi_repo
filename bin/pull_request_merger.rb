@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH << File.expand_path("../lib", __dir__)
-
-require 'bundler/setup'
-require "multi_repo/cli"
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
+end
 
 opts = Optimist.options do
   opt :prs,      "The list of PRs to merge",           :type => :strings, :required => true

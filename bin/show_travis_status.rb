@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH << File.expand_path("../lib", __dir__)
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
+end
 
-require 'bundler/setup'
-require "multi_repo/cli"
 require 'more_core_extensions/core_ext/array/tableize'
 require 'action_view' # For ActionView::Helpers::DateHelper
 require 'travis'
