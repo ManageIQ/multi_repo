@@ -37,18 +37,4 @@ module MultiRepo
   def self.repos_dir
     @repos_dir ||= root_dir.join("repos")
   end
-
-  #
-  # Configuration
-  #
-
-  def self.config_files_for(prefix)
-    Dir.glob(config_dir.join("#{prefix}*.yml")).sort
-  end
-
-  def self.load_config_file(prefix)
-    config_files_for(prefix).each_with_object({}) do |f, h|
-      h.merge!(YAML.unsafe_load_file(f))
-    end
-  end
 end
