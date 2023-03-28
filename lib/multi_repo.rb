@@ -1,6 +1,8 @@
 require 'pathname'
 require 'pp'
 
+require 'multi_repo/version'
+
 require 'multi_repo/labels'
 require 'multi_repo/repo'
 require 'multi_repo/repo_set'
