@@ -1,4 +1,5 @@
 require "multi_repo"
+require "optimist"
 
 module MultiRepo
   module CLI
