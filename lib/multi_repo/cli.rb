@@ -19,7 +19,9 @@ module MultiRepo
       if repo
         Array(repo).map { |n| repo_for(n) }
       else
-        MultiRepo::RepoSet[repo_set]
+        MultiRepo::RepoSet[repo_set].tap do |repos|
+          Optimist.die(:repo_set, "#{repo_set.inspect} was not found in the config") if repos.nil?
+        end
       end
     end
 
