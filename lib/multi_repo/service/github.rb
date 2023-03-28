@@ -105,14 +105,14 @@ module MultiRepo::Service
       }
     end
 
-    attr_reader :dry_run, :client
+    attr_reader :dry_run
 
     def initialize(dry_run: false)
       @dry_run = dry_run
-      @client  = self.class.client
     end
 
-    delegate :org_repos,
+    delegate :client,
+             :org_repos,
              :find_milestone_by_title,
              :org_member_names,
              :find_team_by_name,

@@ -86,7 +86,7 @@ module MultiRepo::Service
     def push_gem(package)
       if dry_run
         raise "#{package} not found" unless File.file?(package)
-        puts "** dry-run: gem push #{package}"
+        puts "** dry-run: gem push #{package}".light_black
       else
         system("gem push #{package}")
       end
@@ -94,7 +94,7 @@ module MultiRepo::Service
 
     def set_gem_owner(owner)
       if dry_run
-        puts "** dry-run: gem owner #{repo} --add #{owner}"
+        puts "** dry-run: gem owner #{repo} --add #{owner}".light_black
       else
         system("gem owner #{repo} --add #{owner}")
       end

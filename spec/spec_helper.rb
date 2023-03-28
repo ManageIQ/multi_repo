@@ -1,5 +1,6 @@
 require "multi_repo"
 require "pathname"
+require "fileutils"
 
 SPEC_DATA = Pathname.new(__dir__).join("data").expand_path
 

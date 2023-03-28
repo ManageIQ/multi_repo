@@ -1,8 +1,3 @@
-require 'rest-client'
-require 'json'
-require 'more_core_extensions/core_ext/array'
-require 'more_core_extensions/core_ext/hash'
-
 module MultiRepo::Service
   class CodeClimate
     def self.api_token
@@ -63,7 +58,7 @@ module MultiRepo::Service
 
     def test_reporter_id
       ensure_enabled
-      @response.fetch_path("data", 0, "attributes", "test_reporter_id")
+      @response.dig("data", 0, "attributes", "test_reporter_id")
     end
 
     def create_repo_secret
@@ -75,9 +70,12 @@ module MultiRepo::Service
     def ensure_enabled
       return if @enabled
 
+      require 'rest-client'
+      require 'json'
+
       @response =
         if dry_run
-          puts "** dry-run: RestClient.get(\"https://api.codeclimate.com/v1/repos?github_slug=#{repo.name}\", #{headers})"
+          puts "** dry-run: RestClient.get(\"https://api.codeclimate.com/v1/repos?github_slug=#{repo.name}\", #{headers})".light_black
           {"data" => [{"attributes" => {"badge_token" => "0123456789abdef01234", "test_reporter_id" => "0123456789abcedef0123456789abcedef0123456789abcedef0123456789abc"}}]}
         else
           JSON.parse(RestClient.get("https://api.codeclimate.com/v1/repos?github_slug=#{repo.name}", headers))

@@ -47,8 +47,8 @@ module MultiRepo::Service
 
     def enable
       if dry_run
-        puts "** dry-run: travis login --com --github-token $GITHUB_API_TOKEN"
-        puts "** dry-run: travis enable --com"
+        puts "** dry-run: travis login --com --github-token $GITHUB_API_TOKEN".light_black
+        puts "** dry-run: travis enable --com".light_black
       else
         `travis login --com --github-token $GITHUB_API_TOKEN`
         `travis enable --com`
@@ -58,7 +58,7 @@ module MultiRepo::Service
     def set_env(hash)
       hash.each do |key, value|
         if dry_run
-          puts "** dry-run: travis env set #{key} #{value}"
+          puts "** dry-run: travis env set #{key} #{value}".light_black
         else
           `travis env set #{key} #{value}`
         end

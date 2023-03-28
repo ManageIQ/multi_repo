@@ -27,10 +27,11 @@ module MultiRepo::Service
       raise MiniGit::GitError.new(args, $?) unless system(command)
     end
 
-    attr_reader :client
+    attr_reader :dry_run, :client
 
-    def initialize(path:, clone_source:)
-      @client = self.class.client(path: path, clone_source: clone_source)
+    def initialize(path:, clone_source:, dry_run: false)
+      @dry_run = dry_run
+      @client  = self.class.client(path: path, clone_source: clone_source)
     end
 
     def fetch(output: false)
@@ -47,7 +48,7 @@ module MultiRepo::Service
       client.checkout("-B", branch, source)
     end
 
-    def destroy_tag(tag, output: false, dry_run: false)
+    def destroy_tag(tag, output: false)
       client = output ? self.client : self.client.capturing
 
       if dry_run
