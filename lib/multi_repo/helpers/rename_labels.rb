@@ -2,7 +2,7 @@ module MultiRepo::Helpers
   class RenameLabels
     attr_reader :repo_name, :rename_hash, :github
 
-    def initialize(repo_name, rename_hash, dry_run: false)
+    def initialize(repo_name, rename_hash, dry_run: false, **)
       @repo_name   = repo_name
       @rename_hash = rename_hash
       @github      = MultiRepo::Service::Github.new(dry_run: dry_run)

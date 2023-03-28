@@ -11,5 +11,5 @@ opts = Optimist.options do
 end
 
 MultiRepo.each_repo(opts) do |repo|
-  MultiRepo::Helpers::UpdateRepoSettings.new(repo.github_repo, opts).run
+  MultiRepo::Helpers::UpdateRepoSettings.new(repo.name, **opts).run
 end

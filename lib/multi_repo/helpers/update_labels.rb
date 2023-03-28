@@ -2,7 +2,7 @@ module MultiRepo::Helpers
   class UpdateLabels
     attr_reader :repo_name, :expected_labels, :github
 
-    def initialize(repo_name, dry_run: false)
+    def initialize(repo_name, dry_run: false, **)
       @repo_name       = repo_name
       @expected_labels = MultiRepo::Labels[repo_name]
       @github          = MultiRepo::Service::Github.new(dry_run: dry_run)

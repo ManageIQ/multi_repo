@@ -5,7 +5,7 @@ module MultiRepo::Helpers
     attr_reader :repo, :dry_run
     attr_accessor :badges
 
-    def initialize(repo, dry_run: false, **_)
+    def initialize(repo, dry_run: false, **)
       @repo    = repo
       @dry_run = dry_run
       reload

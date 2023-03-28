@@ -4,7 +4,7 @@ module MultiRepo::Helpers
   class UpdateMilestone
     attr_reader :repo_name, :title, :due_on, :close, :github
 
-    def initialize(repo_name, title:, due_on:, close:, dry_run: false)
+    def initialize(repo_name, title:, due_on:, close:, dry_run: false, **)
       raise ArgumentError, "due_on must be specified" if due_on.nil? && !close
 
       @repo_name = repo_name

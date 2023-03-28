@@ -19,72 +19,27 @@ class MultiRepo::MakeAlumni
   def initialize(org:, dry_run:, **_)
     @org     = org
     @dry_run = dry_run
+    @github  = MultiRepo::Service::Github.new(dry_run: dry_run)
   end
 
   def run(user)
     progress = MultiRepo.progress_bar(teams.size + repos.size)
 
-    add_team_membership("alumni", user)
+    github.add_team_membership(org, "alumni", user)
     progress.increment
 
-    non_alumni_teams = teams - ["alumni"]
+    non_alumni_teams = github.team_names(org) - ["alumni"]
     non_alumni_teams.each do |team|
-      remove_team_membership(team, user)
+      github.remove_team_membership(org, team, user)
       progress.increment
     end
 
     repos.each do |repo|
-      remove_collaborator(repo, user)
+      github.remove_collaborator(repo, user)
       progress.increment
     end
 
     progress.finish
-  end
-
-  private
-
-  def team_ids
-    @team_ids ||= github.org_teams(org).map { |t| [t.slug, t.id] }.sort.to_h
-  end
-
-  def teams
-    @teams ||= team_ids.keys
-  end
-
-  def repos
-    @repos ||= github.org_repos(org).reject(&:archived?).map(&:full_name).sort
-  end
-
-  def add_team_membership(team, user)
-    team_id = team_ids[team]
-
-    if dry_run
-      puts "** dry-run: github.add_team_membership(#{team_id.inspect}, #{user.inspect})"
-    else
-      github.add_team_membership(team_id, user)
-    end
-  end
-
-  def remove_team_membership(team, user)
-    team_id = team_ids[team]
-
-    if dry_run
-      puts "** dry-run: github.remove_team_membership(#{team_id.inspect}, #{user.inspect})"
-    else
-      github.remove_team_membership(team_id, user)
-    end
-  end
-
-  def remove_collaborator(repo, user)
-    if dry_run
-      puts "** dry-run: github.remove_collaborator(#{repo.inspect}, #{user.inspect})"
-    else
-      github.remove_collaborator(repo, user)
-    end
-  end
-
-  def github
-    MultiRepo::Service::Github.client
   end
 end
 

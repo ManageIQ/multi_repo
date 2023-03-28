@@ -5,7 +5,7 @@ module MultiRepo::Helpers
     attr_reader :repo, :base, :head, :script, :dry_run, :message, :title
 
     ROOT_DIR = Pathname.new(__dir__).join("..", "..", "..").freeze
-    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, **_)
+    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, **)
       @repo    = repo
       @base    = base
       @head    = head

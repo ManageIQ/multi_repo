@@ -18,6 +18,6 @@ rename_hash = opts[:old].zip(opts[:new]).to_h
 puts "Renaming: #{rename_hash.pretty_inspect}"
 puts
 
-MultiRepo.each_repo(opts) do |repo|
-  MultiRepo::Helpers::RenameLabels.new(repo.github_repo, rename_hash, opts).run
+MultiRepo.each_repo(**opts) do |repo|
+  MultiRepo::Helpers::RenameLabels.new(repo.name, rename_hash, **opts).run
 end

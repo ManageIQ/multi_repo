@@ -19,7 +19,7 @@ HEADER = %w(Repo SHA Message).freeze
 def show_tag(repo, tag)
   line =
     begin
-      repo.git.capturing.show({:summary => true, :oneline => true}, tag)
+      repo.git.client.capturing.show({:summary => true, :oneline => true}, tag)
     rescue MiniGit::GitError => err
       ""
     end

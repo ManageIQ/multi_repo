@@ -17,6 +17,6 @@ MultiRepo.repos_for(**opts).each do |repo|
   next if opts[:branch] != "master" && repo.config.has_real_releases
 
   puts MultiRepo.header(repo.name)
-  MultiRepo::Helpers::UpdateBranchProtection.new(repo.github_repo, **opts).run
+  MultiRepo::Helpers::UpdateBranchProtection.new(repo.name, **opts).run
   puts
 end

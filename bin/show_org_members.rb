@@ -7,25 +7,13 @@ require 'multi_repo'
 require 'optimist'
 
 opts = Optimist.options do
-  opt :org,    "The org to list the users for",    :default => "ManageIQ"
+  opt :org,    "The org to list the users for",    :type => :string, :required => true
   opt :team,   "Show members of a specific team",  :type => :string
   opt :alumni, "Whether or not to include alumni", :default => false
 end
 
-def github
-  MultiRepo::Service::Github.client
-end
-
-def org_members(org:, **_)
-  github.org_members(org).map(&:login).sort_by(&:downcase)
-end
-
-def team_members(org:, team:, **_)
-  team_id = github.org_teams(org).detect { |t| t.slug == team }.id
-  github.team_members(team_id).map(&:login).sort_by(&:downcase)
-end
-
-members  = opts[:team] ? team_members(opts) : org_members(opts)
-members -= team_members(opts.merge(team: "alumni")) unless opts[:alumni]
+github = MultiRepo::Service::Github.new
+members  = opts[:team] ? github.team_member_names(opts[:org], opts[:team]) : github.org_member_names(opts[:org])
+members -= github.team_member_names(opts[:org], "alumni") unless opts[:alumni]
 
 puts members

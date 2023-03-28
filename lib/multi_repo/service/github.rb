@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 module MultiRepo::Service
   class Github
     def self.api_token
@@ -31,11 +33,54 @@ module MultiRepo::Service
       end
     end
 
-    def self.repo_names_for(org)
-      client
-        .list_repositories(org, :type => "sources")
-        .reject { |r| r.fork? || r.archived? }
-        .map { |r| "#{org}/#{r.name}" }
+    def self.org_repo_names(org, include_forks: false, include_archived: false)
+      repos = client.list_repositories(org, :type => "sources")
+      repos.reject!(&:fork?) unless include_forks
+      repos.reject!(&:archived?) unless include_archived
+      repos.map(&:full_name).sort
+    end
+
+    def self.valid_milestone_date?(date)
+      !!parse_milestone_date(date)
+    end
+
+    def self.parse_milestone_date(date)
+      require "active_support/core_ext/time"
+      ActiveSupport::TimeZone.new('Pacific Time (US & Canada)').parse(date) # LOL GitHub, TimeZones are hard
+    end
+
+    def self.find_milestone_by_title(repo_name, title)
+      client.list_milestones(repo_name, :state => :all).detect { |m| m.title.casecmp?(title) }
+    end
+
+    def self.org_member_names(org)
+      client.org_members(org).map(&:login).sort_by(&:downcase)
+    end
+
+    def self.find_team_by_name(org, team)
+      client.org_teams(org).detect { |t| t.slug == team }
+    end
+
+    def self.team_members(org, team)
+      team_id = find_team_by_name(org, team)&.id
+      team_id ? client.team_members(team_id) : []
+    end
+
+    def self.team_member_names(org, team)
+      team_members(org, team).map(&:login).sort_by(&:downcase)
+    end
+
+    def self.team_ids_by_name(org)
+      @team_ids ||= {}
+      @team_ids[org] ||= client.org_teams(org).map { |t| [t.slug, t.id] }.sort.to_h
+    end
+
+    def self.team_names(org)
+      team_ids(org).keys
+    end
+
+    def self.disabled_workflows(repo_name)
+      client.workflows(repo_name)[:workflows].select { |w| w.state == "disabled_inactivity" }
     end
 
     def self.create_or_update_repository_secret(repo_name, key, value)
@@ -67,6 +112,18 @@ module MultiRepo::Service
       @client  = self.class.client
     end
 
+    delegate :org_repos,
+             :find_milestone_by_title,
+             :org_member_names,
+             :find_team_by_name,
+             :team_members,
+             :team_member_names,
+             :team_ids_by_name,
+             :team_names,
+             :disabled_workflows,
+             :create_or_update_repository_secret,
+             :to => :class
+
     def edit_repository(repo_name, settings)
       if dry_run
         puts "** dry-run: github.edit_repository(#{repo_name.inspect}, #{settings.inspect[1..-2]})".light_black
@@ -94,17 +151,12 @@ module MultiRepo::Service
       end
     end
 
-    def self.valid_milestone_date?(date)
-      !!parse_milestone_date(date)
-    end
-
-    def self.parse_milestone_date(date)
-      require "active_support/core_ext/time"
-      ActiveSupport::TimeZone.new('Pacific Time (US & Canada)').parse(date) # LOL GitHub, TimeZones are hard
-    end
-
-    def find_milestone_by_title(repo_name, title)
-      client.list_milestones(repo_name, :state => :all).detect { |m| m.title.casecmp?(title) }
+    def delete_label!(repo_name, label)
+      if dry_run
+        puts "** dry-run: github.delete_label!(#{repo_name.inspect}, #{label.inspect})".light_black
+      else
+        client.delete_label!(repo_name, label)
+      end
     end
 
     def create_milestone(repo_name, title, due_on)
@@ -136,6 +188,44 @@ module MultiRepo::Service
         puts "** dry-run: github.protect_branch(#{repo_name.inspect}, #{branch.inspect}, #{settings.inspect[1..-2]})".light_black
       else
         client.protect_branch(repo_name, branch, settings)
+      end
+    end
+
+    def add_team_membership(org, team, user)
+      team_id = team_ids_by_name(org)[team]
+
+      if dry_run
+        puts "** dry-run: github.add_team_membership(#{team_id.inspect}, #{user.inspect})".light_black
+      else
+        client.add_team_membership(team_id, user)
+      end
+    end
+
+    def remove_team_membership(org, team, user)
+      team_id = team_ids_by_name(org)[team]
+
+      if dry_run
+        puts "** dry-run: github.remove_team_membership(#{team_id.inspect}, #{user.inspect})".light_black
+      else
+        client.remove_team_membership(team_id, user)
+      end
+    end
+
+    def remove_collaborator(repo_name, user)
+      if dry_run
+        puts "** dry-run: github.remove_collaborator(#{repo_name.inspect}, #{user.inspect})".light_black
+      else
+        client.remove_collaborator(repo_name, user)
+      end
+    end
+
+    def enable_workflow(repo_name, workflow_number)
+      command = "repos/#{repo_name}/actions/workflows/#{workflow_number}/enable"
+
+      if dry_run
+        puts "** dry-run: github.put(#{command.inspect})".light_black
+      else
+        client.put(command)
       end
     end
   end

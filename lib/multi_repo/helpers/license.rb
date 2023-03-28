@@ -2,7 +2,7 @@ module MultiRepo::Helpers
   class License
     attr_reader :repo, :dry_run
 
-    def initialize(repo, dry_run: false, **_)
+    def initialize(repo, dry_run: false, **)
       @repo    = repo
       @dry_run = dry_run
       reload

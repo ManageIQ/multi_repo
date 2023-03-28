@@ -13,18 +13,11 @@ opts = Optimist.options do
 end
 opts[:repo] = MultiRepo::Helpers::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]
 
-def delete(repo, label, dry_run:, **_)
-  puts "Deleting #{label.inspect}"
-
-  if dry_run
-    puts "** dry-run: github.delete_label!(#{repo.inspect}, #{label.inspect})"
-  else
-    MultiRepo::Service::Github.client.delete_label!(repo, label)
-  end
-end
+github = MultiRepo::Service::Github.new(dry_run: opts[:dry_run])
 
 MultiRepo.each_repo(opts) do |repo|
   opts[:labels].each do |label|
-    delete(repo.github_repo, label, opts)
+    puts "Deleting #{label.inspect}"
+    github.delete_label!(repo.name, label)
   end
 end

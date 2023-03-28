@@ -2,7 +2,7 @@ module MultiRepo::Helpers
   class UpdateRepoSettings
     attr_reader :repo_name, :github
 
-    def initialize(repo_name, dry_run: false)
+    def initialize(repo_name, dry_run: false, **)
       @repo_name = repo_name
       @github    = MultiRepo::Service::Github.new(dry_run: dry_run)
     end

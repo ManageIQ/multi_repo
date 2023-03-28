@@ -12,5 +12,5 @@ end
 opts[:repo] = MultiRepo::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]
 
 MultiRepo.each_repo(opts) do |repo|
-  MultiRepo::Helpers::UpdateLabels.new(repo.github_repo, opts).run
+  MultiRepo::Helpers::UpdateLabels.new(repo.name, **opts).run
 end
