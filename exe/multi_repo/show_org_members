@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :org,    "The org to list the users for",    :type => :string, :required => true
+  opt :team,   "Show members of a specific team",  :type => :string
+  opt :alumni, "Whether or not to include alumni", :default => false
+end
+
+github = MultiRepo::Service::Github.new
+members  = opts[:team] ? github.team_member_names(opts[:org], opts[:team]) : github.org_member_names(opts[:org])
+members -= github.team_member_names(opts[:org], "alumni") unless opts[:alumni]
+
+puts members

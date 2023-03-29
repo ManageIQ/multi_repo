@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :checkout, "Branch to checkout after fetching.", :type => :string
+
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
+end
+
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  repo.git.fetch
+  repo.git.hard_checkout(opts[:checkout]) if opts[:checkout]
+end

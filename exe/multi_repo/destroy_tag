@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :tag, "The tag to destroy", :type => :string, :required => true
+
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
+end
+
+require "stringio"
+post_review = StringIO.new
+
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  unless repo.git.tag?(opts[:tag])
+    puts "!! Skipping because #{opts[:tag]} tag doesn't exist".yellow
+    next
+  end
+
+  repo.git.client.tag("-d", opts[:tag])
+  post_review.puts("pushd #{repo.path} && git push origin :#{opts[:tag]} && popd")
+end
+
+puts
+puts "Run the following script to delete '#{opts[:tag]}' tag from all remote repos"
+puts
+puts post_review.string

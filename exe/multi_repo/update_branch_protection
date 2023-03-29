@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :branch, "The branch to protect.", :type => :string, :required => true
+
+  MultiRepo::CLI.common_options(self, :repo_set_default => nil)
+end
+opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
+
+MultiRepo::CLI.repos_for(**opts).each do |repo|
+  next if opts[:branch] != "master" && repo.config.has_real_releases
+
+  puts MultiRepo::CLI.header(repo.name)
+  MultiRepo::Helpers::UpdateBranchProtection.new(repo.name, **opts).run
+  puts
+end

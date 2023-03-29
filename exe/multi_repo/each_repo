@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :command, "A command to run in each repo", :type => :string, :required => true
+  opt :ref, "Ref to checkout before running the command", :type => :string, :default => "master"
+
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
+end
+
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  repo.git.fetch
+  repo.git.hard_checkout(opts[:ref])
+  repo.chdir do
+    puts "+ #{opts[:command]}".light_black
+    system(opts[:command])
+  end
+end

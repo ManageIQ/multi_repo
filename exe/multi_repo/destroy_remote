@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :remote, "The remote to destroy", :type => :string, :required => true
+
+  MultiRepo::CLI.common_options(self)
+end
+
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  unless repo.git.remote?(opts[:remote])
+    puts "!! Skipping because #{opts[:remote]} remote doesn't exist".yellow
+    next
+  end
+
+  if opts[:dry_run]
+    puts "** dry-run: git remote rm #{opts[:remote]}".light_black
+  else
+    repo.git.client.remote("rm", opts[:remote])
+  end
+end

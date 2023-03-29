@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :branch, "The branch to destroy.", :type => :string, :required => true
+
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
+end
+
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  unless repo.git.branch?(opts[:branch])
+    puts "!! Skipping because #{opts[:branch]} branch doesn't exist".yellow
+    next
+  end
+
+  repo.git.client.checkout("master")
+  repo.git.client.branch("-D", opts[:branch])
+end

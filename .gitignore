@@ -1,5 +1,6 @@
 /.bundle/
-/mirrors
-/repos
-config/settings.local.yml
+/config/
+/mirrors/
+/repos/
+/spec/root/
 Gemfile.lock

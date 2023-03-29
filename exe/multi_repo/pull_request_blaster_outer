@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+end
+
+opts = Optimist.options do
+  opt :base,    "The target branch for the changes.",                         :type => :string, :required => true
+  opt :head,    "The name of the branch to create on your fork.",             :type => :string, :required => true
+  opt :script,  "The path to the script that will update the desired files.", :type => :string, :required => true
+  opt :message, "The commit message for this change.",                        :type => :string, :required => true
+  opt :title,   "The PR title for this change. (default is --message)",       :type => :string
+
+  MultiRepo::CLI.common_options(self)
+end
+
+results = {}
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  results[repo.github_repo] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
+end
+
+pp results
