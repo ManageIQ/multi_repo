@@ -2,6 +2,7 @@ module MultiRepo::Service
   class Git
     def self.client(path:, clone_source:)
       require "minigit"
+      require_relative "git/minigit_capturing_patch"
 
       retried = false
       MiniGit.debug = true if ENV["GIT_DEBUG"]

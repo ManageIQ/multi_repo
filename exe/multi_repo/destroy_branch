@@ -13,8 +13,11 @@ opts = Optimist.options do
 end
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
-  repo.chdir do
-    system("git checkout master")
-    system("git branch -D #{opts[:branch]}")
+  unless repo.git.branch?(opts[:branch])
+    puts "!! Skipping because #{opts[:branch]} branch doesn't exist".yellow
+    next
   end
+
+  repo.git.client.checkout("master")
+  repo.git.client.branch("-D", opts[:branch])
 end

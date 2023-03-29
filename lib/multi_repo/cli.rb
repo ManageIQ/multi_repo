@@ -1,5 +1,6 @@
 require "multi_repo"
 require "optimist"
+require "colorize"
 
 module MultiRepo
   module CLI
