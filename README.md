@@ -1,47 +1,63 @@
-# ManageIQ release tools
+# MultiRepo
 
-[![Code Climate](https://codeclimate.com/github/ManageIQ/manageiq-release.svg)](https://codeclimate.com/github/ManageIQ/manageiq-release)
+MultiRepo is a tool for managing multiple git repositories.
 
-Tools for releasing new branches and tags of ManageIQ.
+[![Gem Version](https://badge.fury.io/rb/multi_repo.svg)](http://badge.fury.io/rb/multi_repo)
+[![CI](https://github.com/ManageIQ/multi_repo/actions/workflows/ci.yaml/badge.svg)](https://github.com/ManageIQ/multi_repo/actions/workflows/ci.yaml)
+[![Code Climate](http://img.shields.io/codeclimate/github/ManageIQ/multi_repo.svg)](https://codeclimate.com/github/ManageIQ/multi_repo)
 
 ## Installation
 
 ```sh
-git clone https://github.com/ManageIQ/manageiq-release.git
-bundle
+gem install multi_repo
 ```
+
+## Configuration
 
 ## Usage
 
-- Release a new branch
+Typical usage will be from single scripts. In order to keep each script manageable, it can be preferable to use bundler/inline to define the gems needed by that script. To do this, add the following to the top of the script:
 
-  ```sh
-  bin/release_branch.rb --branch <branch_name>
-  ```
+```ruby
+#/usr/bin/env ruby
 
-- Release a new tag
+require "bundler/inline"
+gemfile do
+  source "https://rubygems.org"
+  gem "multi_repo", require: "multi_repo/cli"
+end
+```
 
-  ```sh
-  bin/release_tag.rb [--dry-run] --tag <new_tag_name> --branch <branch_name>
-  ```
+Then, you would set up options for your script. A `MultiRepo::CLI` helper is provided to make this easier. It has the [optimist](https://github.com/ManageIQ/optimist) gem already prepared and comes with a `.common_options` helper method to set up options for `--repo-set`, `--repo`, and `--dry-run`. For example,
 
-- Destroy a tag that was incorrectly created locally
+```ruby
+opts = Optimist.options do
+  opt :some_opt, "An option your script needs", :type => :string, :required => true
 
-  ```sh
-  bin/destroy_tag.rb --tag <tag_name> --branch <branch_name>
-  ```
+  MultiRepo::CLI.common_options(self)
+end
+```
 
-- Update the repository labels (see also [GitHub interactions](#github-interactions))
+would produce the following help output:
 
-  ```sh
-  bin/update_labels.rb [--dry-run]
-  ```
+```
+Options:
+  -o, --some-opt=<s>    An option your script needs
 
-- Update the repository settings (see also [GitHub interactions](#github-interactions))
+Common Options:
+  -s, --repo-set=<s>    The repo set to work with (default: master)
+  -r, --repo=<s+>       Individual repo(s) to work with; Overrides --repo-set
+  -d, --dry-run         Execute without making changes
+  -h, --help            Show this message
+```
 
-  ```sh
-  bin/update_repo_settings.rb [--dry-run] [--branch <specific branch>] [--repo <specific_repo>]
-  ```
+After you have set up the options, you can write your script. `MultiRepo::Service` classes are provided to help interface with common third-party services, such as GitHub. `MultiRepo::Helper` classes are provided to do relatively common operations, such as renaming labels. The `MultiRepo::CLI` class also has helpers for looping over the repo set.  For example, to loop over each repo in the repo set and show the file contents one can do:
+
+```ruby
+MultiRepo::CLI.each_repo(**opts) do |repo|
+  system("ls")
+end
+```
 
 ## GitHub interactions
 
@@ -61,22 +77,13 @@ purposes
 Then, in order to use it, export the ENV variable permanently, or pass it to the
 program as part of the call.
 
-  ```sh
-  GITHUB_API_TOKEN=<token> bin/update_labels.rb
-  ```
-
-## Development
-
-Some things to note:
-
-- The bin scripts are driven off of the `config/repos.yml` file.  This file
-  lists the various branches and which repos make up a release for that branch.
-- There is a `bin/console` script which is helpful for console-based testing.
-  It will open an IRB session with the libraries files already required.
+```sh
+GITHUB_API_TOKEN=<token> bin/update_labels
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ManageIQ/manageiq-release.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ManageIQ/multi_repo.
 
 ## License
 
