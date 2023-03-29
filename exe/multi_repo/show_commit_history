@@ -5,6 +5,8 @@ gemfile do
   source "https://rubygems.org"
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
 end
+require "active_support/core_ext/object/blank"
+require "active_support/core_ext/string/inflections"
 
 DISPLAY_FORMATS = %w[commit pr-title pr-label]
 
@@ -14,7 +16,7 @@ opts = Optimist.options do
   opt :display, "How to display the history. Valid values are: #{DISPLAY_FORMATS.join(", ")}", :default => "commit"
   opt :summary, "Display a summary of the repos.", :default => false
 
-  opt :skip,   "The repos to skip", :default => ["manageiq-documentation"]
+  opt :skip,   "The repos to skip", :type => :strings, :default => []
 
   MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
@@ -27,11 +29,10 @@ puts "Git commit log between #{opts[:from]} and #{opts[:to]}\n\n"
 repos_with_changes = []
 
 MultiRepo::CLI.repos_for(**opts).each do |repo|
-  next if repo.config.has_real_releases || repo.config.skip_tag
   next if opts[:skip].include?(repo.name)
 
-  puts MultiRepo.header(repo.name)
-  repo.fetch(output: false)
+  puts MultiRepo::CLI.header(repo.name)
+  repo.git.fetch(output: false)
 
   case opts[:display]
   when "pr-label", "pr-title"
@@ -45,11 +46,11 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
     end
     results["other"] = []
 
-    log = repo.git.capturing.log({:oneline => true}, range)
+    log = repo.git.client.capturing.log({:oneline => true}, range)
     log.lines.each do |line|
       next unless (match = line.match(/Merge pull request #(\d+)\b/))
 
-      pr = github.pull_request(repo.github_repo, match[1])
+      pr = github.pull_request(repo.name, match[1])
       label = pr.labels.detect { |l| results.key?(l.name) }&.name || "other"
       results[label] << pr
     end
@@ -68,7 +69,7 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
 
     repos_with_changes << repo if changes_found
   when "commit"
-    output = repo.git.capturing.log({:oneline => true, :decorate => true, :graph => true}, range)
+    output = repo.git.client.capturing.log({:oneline => true, :decorate => true, :graph => true}, range)
     puts output
     repos_with_changes << repo if output.present?
   end
@@ -79,7 +80,7 @@ if opts[:summary] && repos_with_changes.any?
   puts
   puts "Here are the changes per affected repository in GitHub:"
   repos_with_changes.each do |repo|
-    puts "* [#{repo.name}](https://github.com/#{repo.github_repo}/compare/#{opts[:from]}...#{opts[:to]})"
+    puts "* [#{repo.name}](https://github.com/#{repo.name}/compare/#{opts[:from]}...#{opts[:to]})"
   end
   puts
 end

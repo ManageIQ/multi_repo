@@ -13,5 +13,5 @@ opts = Optimist.options do
 end
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
-  MultiRepo::Service::RubygemsStub.new(repo.name, opts).run
+  MultiRepo::Service::RubygemsStub.new(repo.name, **opts).run
 end

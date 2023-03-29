@@ -8,7 +8,7 @@ end
 
 opts = Optimist.options do
   opt :users, "The users to make alumni.",     :type => :strings, :required => true
-  opt :org,   "The org in which user belongs", :default => "ManageIQ"
+  opt :org,   "The org in which user belongs", :type => :string,  :required => true
 
   MultiRepo::CLI.common_options(self, :only => :dry_run)
 end
@@ -43,8 +43,8 @@ class MultiRepo::MakeAlumni
   end
 end
 
-make_alumni = MultiRepo::MakeAlumni.new(opts)
+make_alumni = MultiRepo::MakeAlumni.new(**opts)
 opts[:users].each do |user|
-  puts MultiRepo.header(user)
+  puts MultiRepo::CLI.header(user)
   make_alumni.run(user)
 end

@@ -7,14 +7,17 @@ gemfile do
 end
 
 opts = Optimist.options do
+  opt :org, "The organization to reenable workflows in", :type => :string, :required => true
+  opt :extra_repos, "Extra repos to reenable workflows in", :type => :strings, :default => []
+
   MultiRepo::CLI.common_options(self, :only => :dry_run)
-end
+ende
 
 github = MultiRepo::Service::Github.new(**opts.slice(:dry_run))
 
-repos = (github.org_repo_names("ManageIQ") << "ManageIQ/rbvmomi2").sort
+repos = (github.org_repo_names(opts[:org]) + opts[:extra_repos]).sort
 repos.each do |repo_name|
-  puts MultiRepo.header(repo_name)
+  puts MultiRepo::CLI.header(repo_name)
 
   disabled_workflows = github.disabled_workflows
   if disabled_workflows.any?

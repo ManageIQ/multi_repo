@@ -69,6 +69,7 @@ module MultiRepo::Service
     else
       true
     end
+    alias_method :tag?, :branch?
 
     def remote?(remote)
       client.capturing.remote("show", remote)

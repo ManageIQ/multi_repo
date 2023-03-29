@@ -21,5 +21,4 @@ MultiRepo::CLI.each_repo(**opts) do |repo|
   results[repo.github_repo] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
 end
 
-require 'pp'
 pp results

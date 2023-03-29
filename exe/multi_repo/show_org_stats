@@ -43,11 +43,11 @@ class OrgStats
   private
 
   def run_one(repo)
-    repo.fetch
-    repo.checkout("master")
+    repo.git.fetch
+    repo.git.hard_checkout("master")
 
     puts "Commits:"
-    commits = repo.git.capturing.shortlog("--summary", "--numbered", "--email", "--no-merges", "--since", @since)
+    commits = repo.git.client.capturing.shortlog("--summary", "--numbered", "--email", "--no-merges", "--since", @since)
     puts commits
 
     parse_data(commits).each do |number, name, email|
@@ -56,7 +56,7 @@ class OrgStats
     end
 
     puts "Merges:"
-    merges = repo.git.capturing.shortlog("--summary", "--numbered", "--email", "--merges", "--since", @since, "--grep", "Merge pull request #")
+    merges = repo.git.client.capturing.shortlog("--summary", "--numbered", "--email", "--merges", "--since", @since, "--grep", "Merge pull request #")
     puts merges
 
     parse_data(merges).each do |number, name, email|

@@ -6,5 +6,4 @@ gemfile do
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
 end
 
-success = MultiRepo::Helpers::GitMirror.new.mirror_all
-exit 1 unless success
+exit 1 unless MultiRepo::Helpers::GitMirror.new.mirror_all

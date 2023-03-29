@@ -13,11 +13,14 @@ opts = Optimist.options do
 end
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
-  next unless repo.remote?(opts[:remote])
+  unless repo.git.remote?(opts[:remote])
+    puts "!! Skipping because #{opts[:remote]} remote doesn't exist".yellow
+    next
+  end
 
   if opts[:dry_run]
-    puts "** dry-run: git rm #{opts[:remote]}"
+    puts "** dry-run: git remote rm #{opts[:remote]}".light_black
   else
-    repo.git.remote("rm", opts[:remote])
+    repo.git.client.remote("rm", opts[:remote])
   end
 end

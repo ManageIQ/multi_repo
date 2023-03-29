@@ -18,9 +18,7 @@ opts[:repo_set] = opts[:ref].split("-").first unless opts[:repo] || opts[:repo_s
 puts "Restarting Travis builds for #{opts[:ref]}:"
 
 MultiRepo::CLI.repos_for(**opts).collect do |repo|
-  next if repo.config.has_real_releases
-
-  repo = Travis::Pro::Repository.find(repo.github_repo)
+  repo = Travis::Pro::Repository.find(repo.name)
   begin
     last_build = repo.last_on_branch(opts[:ref])
   rescue Travis::Client::NotFound

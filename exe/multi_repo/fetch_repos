@@ -7,14 +7,12 @@ gemfile do
 end
 
 opts = Optimist.options do
-  opt :branch,   "The branch to fetch.",                   :type => :string,  :required => true
-  opt :checkout, "Checkout target branch after fetching.", :type => :boolean, :default => false
+  opt :checkout, "Branch to checkout after fetching.", :type => :string
 
-  MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
-opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
-  repo.fetch
-  repo.checkout(opts[:branch]) if opts[:checkout] && opts[:branch] && !repo.config.has_real_releases
+  repo.git.fetch
+  repo.git.hard_checkout(opts[:checkout]) if opts[:checkout]
 end

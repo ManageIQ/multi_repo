@@ -16,7 +16,7 @@ opts[:repo_set] = opts[:branch] unless opts[:repo] || opts[:repo_set]
 MultiRepo::CLI.repos_for(**opts).each do |repo|
   next if opts[:branch] != "master" && repo.config.has_real_releases
 
-  puts MultiRepo.header(repo.name)
+  puts MultiRepo::CLI.header(repo.name)
   MultiRepo::Helpers::UpdateBranchProtection.new(repo.name, **opts).run
   puts
 end

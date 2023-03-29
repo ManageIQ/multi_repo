@@ -9,18 +9,20 @@ end
 opts = Optimist.options do
   opt :tag, "The tag to destroy", :type => :string, :required => true
 
-  MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)
+  MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
-opts[:repo_set] = opts[:tag].split("-").first unless opts[:repo] || opts[:repo_set]
 
+require "stringio"
 post_review = StringIO.new
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
-  next if repo.config.has_real_releases || repo.config.skip_tag
+  unless repo.git.tag?(opts[:tag])
+    puts "!! Skipping because #{opts[:tag]} tag doesn't exist".yellow
+    next
+  end
 
-  destroy_tag = MultiRepo::Helpers::DestroyTag.new(repo, opts)
-  destroy_tag.run
-  post_review.puts(destroy_tag.post_review)
+  repo.git.client.tag("-d", opts[:tag])
+  post_review.puts("pushd #{repo.path} && git push origin :#{opts[:tag]} && popd")
 end
 
 puts

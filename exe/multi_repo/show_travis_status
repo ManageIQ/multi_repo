@@ -4,6 +4,7 @@ require "bundler/inline"
 gemfile do
   source "https://rubygems.org"
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("../..", __dir__)
+  gem "action_view"
 end
 
 require 'more_core_extensions/core_ext/array/tableize'
@@ -21,9 +22,7 @@ opts[:repo_set] = opts[:ref].split("-").first unless opts[:repo] || opts[:repo_s
 date_helper = Class.new { include ActionView::Helpers::DateHelper }.new
 
 travis_repos = MultiRepo::CLI.repos_for(**opts).collect do |repo|
-  next if repo.config.has_real_releases
-
-  repo = Travis::Pro::Repository.find(repo.github_repo)
+  repo = Travis::Pro::Repository.find(repo.name)
   begin
     last_build = repo.last_on_branch(opts[:ref])
   rescue Travis::Client::NotFound

@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.7.0"
 
   spec.add_runtime_dependency "activesupport"
-  spec.add_runtime_dependency "actionview"
   spec.add_runtime_dependency "colorize"
   spec.add_runtime_dependency "config"
   spec.add_runtime_dependency "licensee"
