@@ -13,7 +13,7 @@ opts = Optimist.options do
   MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 
-MultiRepo.each_repo(**opts) do |r|
+MultiRepo::CLI.each_repo(**opts) do |r|
   r.fetch
   r.checkout(opts[:ref])
   r.chdir do

@@ -15,7 +15,7 @@ opts[:repo] = MultiRepo::Helpers::Labels.all.keys.sort unless opts[:repo] || opt
 
 github = MultiRepo::Service::Github.new(dry_run: opts[:dry_run])
 
-MultiRepo.each_repo(opts) do |repo|
+MultiRepo::CLI.each_repo(**opts) do |repo|
   opts[:labels].each do |label|
     puts "Deleting #{label.inspect}"
     github.delete_label!(repo.name, label)

@@ -23,7 +23,7 @@ class OrgStats
   end
 
   def run
-    MultiRepo.each_repo(**@opts) { |repo| run_one(repo) }
+    MultiRepo::CLI.each_repo(**@opts) { |repo| run_one(repo) }
 
     puts
     puts "Total Commits:"

@@ -17,7 +17,7 @@ opts = Optimist.options do
 end
 
 results = {}
-MultiRepo.each_repo(**opts) do |repo|
+MultiRepo::CLI.each_repo(**opts) do |repo|
   results[repo.github_repo] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
 end
 

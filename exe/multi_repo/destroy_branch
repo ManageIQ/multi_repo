@@ -12,7 +12,7 @@ opts = Optimist.options do
   MultiRepo::CLI.common_options(self, :except => :dry_run)
 end
 
-MultiRepo.each_repo(opts) do |repo|
+MultiRepo::CLI.each_repo(**opts) do |repo|
   repo.chdir do
     system("git checkout master")
     system("git branch -D #{opts[:branch]}")
