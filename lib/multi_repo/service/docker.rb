@@ -1,4 +1,4 @@
-module Release
+module MultiRepo::Service
   class Docker
     def self.registry
       @registry ||= ENV.fetch("DOCKER_REGISTRY")
