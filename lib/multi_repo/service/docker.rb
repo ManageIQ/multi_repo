@@ -94,15 +94,13 @@ module MultiRepo::Service
       system_capture!("docker run --rm -it #{"--platform=#{platform} " if platform} #{image} #{command}")
     end
 
-    def fetch_image_by_sha(source_image, image_tag, platform: nil)
-      source_image_name, source_image_sha = source_image.split("@")
-      source_image_sha = source_image_sha.split(":").last
-      image = "#{source_image_name}:#{image_tag}"
+    def fetch_image_by_sha(source_image, tag: nil, platform: nil)
+      source_image_name, _source_image_sha = source_image.split("@")
 
       system!("docker pull #{"--platform=#{platform} " if platform}#{source_image}")
-      system!("docker tag #{source_image} #{image}")
+      system!("docker tag #{source_image} #{source_image_name}:#{tag}") if tag
 
-      image
+      true
     end
 
     def remove_images(*images)
