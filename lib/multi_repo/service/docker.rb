@@ -47,6 +47,7 @@ module MultiRepo::Service
     attr_accessor :registry, :cache, :dry_run
 
     def initialize(registry: self.class.registry, cache: true, dry_run: false)
+      require "rest-client"
       require "fileutils"
       require "json"
 

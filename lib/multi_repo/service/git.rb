@@ -31,6 +31,8 @@ module MultiRepo::Service
     attr_reader :dry_run, :client
 
     def initialize(path:, clone_source:, dry_run: false)
+      require "minigit"
+
       @dry_run = dry_run
       @client  = self.class.client(path: path, clone_source: clone_source)
     end

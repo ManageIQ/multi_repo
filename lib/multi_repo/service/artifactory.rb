@@ -23,7 +23,8 @@ module MultiRepo::Service
     attr_accessor :dry_run, :cache
 
     def initialize(dry_run: false, cache: true)
-      require 'rest-client'
+      require "rest-client"
+      require "json"
 
       @dry_run = dry_run
       @cache   = cache

@@ -108,6 +108,8 @@ module MultiRepo::Service
     attr_reader :dry_run
 
     def initialize(dry_run: false)
+      require "octokit"
+
       @dry_run = dry_run
     end
 
