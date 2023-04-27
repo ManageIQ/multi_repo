@@ -17,10 +17,10 @@ module MultiRepo
 
     attr_reader :name, :dry_run, :config, :path
 
-    def initialize(name, dry_run: false)
+    def initialize(name, dry_run: false, config: nil)
       @name    = name
       @dry_run = dry_run
-      @config  = OpenStruct.new(self.class.config.fetch(name, {}))
+      @config  = (config && OpenStruct.new(config)) || OpenStruct.new(self.class.config.fetch(name, {}))
       @path    = MultiRepo.repos_dir.join(name)
     end
 
