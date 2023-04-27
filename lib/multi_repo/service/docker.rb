@@ -90,8 +90,8 @@ module MultiRepo::Service
         delete_registry_tag(image, tag, **kwargs)
     end
 
-    def run(image, command)
-      system_capture!("docker run --rm -it #{image} #{command}")
+    def run(image, command, platform: nil)
+      system_capture!("docker run --rm -it #{"--platform=#{platform} " if platform} #{image} #{command}")
     end
 
     def fetch_image_by_sha(source_image, image_tag, platform: nil)
