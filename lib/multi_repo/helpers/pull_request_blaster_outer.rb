@@ -4,15 +4,14 @@ module MultiRepo::Helpers
   class PullRequestBlasterOuter
     attr_reader :repo, :base, :head, :script, :dry_run, :message, :title
 
-    ROOT_DIR = Pathname.new(__dir__).join("..", "..", "..").freeze
     def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, **)
       @repo    = repo
       @base    = base
       @head    = head
       @script  = begin
         s = Pathname.new(script)
-        s = ROOT_DIR.join(script) if s.relative?
-        raise "File not found #{s}" unless File.exist?(s)
+        s = Pathname.new(Dir.pwd).join(script) if s.relative?
+        raise "File not found #{s}" unless s.exist?
         s.to_s
       end
       @dry_run = dry_run
