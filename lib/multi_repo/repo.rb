@@ -2,25 +2,12 @@ require 'ostruct'
 
 module MultiRepo
   class Repo
-    def self.config_file
-      MultiRepo.config_dir.join("repos.yml")
-    end
+    attr_reader :name, :config, :dry_run, :path
 
-    def self.config
-      @config ||= begin
-        file = config_file
-        config = file.exist? ? YAML.unsafe_load_file(file) : {}
-        raise "#{config_file} must contain a Hash" unless config.kind_of?(Hash)
-        config
-      end
-    end
-
-    attr_reader :name, :dry_run, :config, :path
-
-    def initialize(name, dry_run: false, config: nil)
+    def initialize(name, config: nil, dry_run: false)
       @name    = name
       @dry_run = dry_run
-      @config  = (config && OpenStruct.new(config)) || OpenStruct.new(self.class.config.fetch(name, {}))
+      @config  = OpenStruct.new(config || {})
       @path    = MultiRepo.repos_dir.join(name)
     end
 
