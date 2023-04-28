@@ -17,7 +17,7 @@ module MultiRepo
         require "more_core_extensions/core_ext/hash/nested"
 
         Array(config["orgs"]).each do |org, options|
-          MultiRepo::Service::Github.repo_names_for(org).each do |repo_name|
+          MultiRepo::Service::Github.org_repo_names(org).each do |repo_name|
             next if config.key_path?("repos", repo_name)
             next if options["except"].include?(repo_name)
 

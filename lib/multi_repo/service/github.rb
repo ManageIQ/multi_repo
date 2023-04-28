@@ -114,7 +114,7 @@ module MultiRepo::Service
     end
 
     delegate :client,
-             :org_repos,
+             :org_repo_names,
              :find_milestone_by_title,
              :org_member_names,
              :find_team_by_name,
