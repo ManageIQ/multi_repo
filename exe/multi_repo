@@ -1,29 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)/scripts"
+SCRIPT_DIR = File.expand_path("../scripts", __dir__)
 
-usage() {
-  echo "Usage: multi_repo <script> [args]"
-  echo "  script      Script to run"
-  echo "  args        Arguments to pass to the script"
-  echo "  -h, --help  Show this help message"
-  echo
-  echo "Available scripts:"
-  for f in $(ls -1 "$SCRIPT_DIR" | sort); do
-    echo "  $f"
-  done
-}
+def usage
+  puts "Usage: multi_repo <script> [args]"
+  puts "  script      Script to run"
+  puts "  args        Arguments to pass to the script"
+  puts "  -h, --help  Show this help message"
 
-if [ -z "$1" -o "$1" = "--help" -o "$1" = "-h" ]; then
+  available_scripts = Dir.children(SCRIPT_DIR).sort.map { |f| "  #{f}"}
+  puts
+  puts "Available scripts:"
+  puts available_scripts
+end
+
+script, args = ARGV[0], ARGV[1..]
+
+if script.nil? || script.empty? || script == "--help" || script == "-h"
   usage
   exit
-fi
+end
 
-if [ ! -f "$SCRIPT_DIR/$1" ]; then
-  echo "ERROR: script '$1' not found"
-  echo
+fq_script = File.join(SCRIPT_DIR, script)
+unless File.exist?(fq_script)
+  puts "ERROR: script #{script.inspect} not found"
+  puts
   usage
   exit 1
-fi
+end
 
-exec "$SCRIPT_DIR/$1" "${@:2}"
+exec fq_script, *args
