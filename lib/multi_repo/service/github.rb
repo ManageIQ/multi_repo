@@ -83,28 +83,6 @@ module MultiRepo::Service
       client.workflows(repo_name)[:workflows].select { |w| w.state == "disabled_inactivity" }
     end
 
-    def self.create_or_update_repository_secret(repo_name, key, value)
-      payload = encode_secret(repo_name, value)
-      client.create_or_update_secret(repo_name, key, payload)
-    end
-
-    private_class_method def self.encode_secret(repo_name, value)
-      require "rbnacl"
-      require "base64"
-
-      repo_public_key = client.get_public_key(repo_name)
-      decoded_repo_public_key = Base64.decode64(repo_public_key.key)
-      public_key = RbNaCl::PublicKey.new(decoded_repo_public_key)
-      box = RbNaCl::Boxes::Sealed.from_public_key(public_key)
-      encrypted_value = box.encrypt(value)
-      encoded_encrypted_value = Base64.strict_encode64(encrypted_value)
-
-      {
-        "encrypted_value" => encoded_encrypted_value,
-        "key_id"          => repo_public_key.key_id
-      }
-    end
-
     attr_reader :dry_run
 
     def initialize(dry_run: false)
@@ -123,7 +101,6 @@ module MultiRepo::Service
              :team_ids_by_name,
              :team_names,
              :disabled_workflows,
-             :create_or_update_repository_secret,
              :to => :class
 
     def edit_repository(repo_name, settings)
@@ -229,6 +206,33 @@ module MultiRepo::Service
       else
         client.put(command)
       end
+    end
+
+    def create_or_update_repository_secret(repo_name, key, value)
+      payload = encode_secret(repo_name, value)
+
+      if dry_run
+        puts "** dry-run: github.create_or_update_secret(#{repo_name.inspect}, #{key.inspect}, #{payload.inspect})".light_black
+      else
+        client.create_or_update_secret(repo_name, key, payload)
+      end
+    end
+
+    private def encode_secret(repo_name, value)
+      require "rbnacl"
+      require "base64"
+
+      repo_public_key = client.get_public_key(repo_name)
+      decoded_repo_public_key = Base64.decode64(repo_public_key.key)
+      public_key = RbNaCl::PublicKey.new(decoded_repo_public_key)
+      box = RbNaCl::Boxes::Sealed.from_public_key(public_key)
+      encrypted_value = box.encrypt(value)
+      encoded_encrypted_value = Base64.strict_encode64(encrypted_value)
+
+      {
+        "encrypted_value" => encoded_encrypted_value,
+        "key_id"          => repo_public_key.key_id
+      }
     end
   end
 end

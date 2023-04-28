@@ -62,7 +62,7 @@ module MultiRepo::Service
     end
 
     def create_repo_secret
-      Github.create_or_update_repository_secret(repo.name, "CC_TEST_REPORTER_ID", test_reporter_id)
+      Github.new(dry_run: dry_run).create_or_update_repository_secret(repo.name, "CC_TEST_REPORTER_ID", test_reporter_id)
     end
 
     private
