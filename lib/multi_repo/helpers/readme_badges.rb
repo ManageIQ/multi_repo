@@ -8,6 +8,11 @@ module MultiRepo::Helpers
     def initialize(repo, dry_run: false, **)
       @repo    = repo
       @dry_run = dry_run
+
+      if repo.dry_run != dry_run
+        raise ArgumentError, "expected repo.dry_run (#{repo.dry_run}) to match dry_run (#{dry_run})"
+      end
+
       reload
     end
 
@@ -71,9 +76,9 @@ module MultiRepo::Helpers
     end
 
     def save_contents!(contents)
-      repo.rm_file("README", dry_run: dry_run)
-      repo.rm_file("README.txt", dry_run: dry_run)
-      repo.write_file("README.md", contents, dry_run: dry_run)
+      repo.rm_file("README")
+      repo.rm_file("README.txt")
+      repo.write_file("README.md", contents)
     end
   end
 end
