@@ -30,12 +30,12 @@ module MultiRepo
       if dry_run
         puts "** dry-run: Writing #{path.join(file).expand_path}".light_black
       else
-        File.write(file, content, kwargs.merge(:chdir => path))
+        chdir { File.write(file, content) }
       end
     end
 
     def rm_file(file)
-      return unless File.exist?(path.join(file))
+      return unless path.join(file).exist?
 
       if dry_run
         puts "** dry-run: Removing #{path.join(file).expand_path}".light_black
