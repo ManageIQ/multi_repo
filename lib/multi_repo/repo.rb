@@ -11,6 +11,8 @@ module MultiRepo
       @path    = MultiRepo.repos_dir.join(name)
     end
 
+    alias to_s inspect
+
     def git
       @git ||= MultiRepo::Service::Git.new(path: path, clone_source: config.clone_source || "git@github.com:#{name}.git", dry_run: dry_run)
     end
