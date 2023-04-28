@@ -2,7 +2,8 @@ require 'ostruct'
 
 module MultiRepo
   class Repo
-    attr_reader :name, :config, :dry_run, :path
+    attr_reader :name, :config, :path
+    attr_accessor :dry_run
 
     def initialize(name, config: nil, dry_run: false)
       @name    = name

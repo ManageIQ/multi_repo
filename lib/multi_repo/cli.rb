@@ -14,22 +14,30 @@ module MultiRepo
       end
     end
 
-    def self.repos_for(repo: nil, repo_set: nil, **_)
+    def self.repos_for(repo: nil, repo_set: nil, dry_run: false, **_)
       Optimist.die("options --repo or --repo_set must be specified") unless repo || repo_set
 
-      if repo
-        Array(repo).map { |n| repo_for(n) }
-      else
-        MultiRepo::RepoSet[repo_set].tap do |repos|
-          Optimist.die(:repo_set, "#{repo_set.inspect} was not found in the config") if repos.nil?
+      if repo_set
+        repos = MultiRepo::RepoSet[repo_set]&.deep_dup
+        Optimist.die(:repo_set, "#{repo_set.inspect} was not found in the config") if repos.nil?
+
+        if repo
+          repo_names = Set.new(Array(repo))
+          repos.select! { |r| repo_names.include?(r.name) }
         end
+
+        repos.each { |r| r.dry_run = dry_run }
+
+        repos
+      else
+        Array(repo).map { |n| MultiRepo::Repo.new(n, dry_run: dry_run) }
       end
     end
 
-    def self.repo_for(repo_name)
+    def self.repo_for(repo_name, repo_set: nil, dry_run: false)
       Optimist.die(:repo, "must be specified") if repo_name.nil?
 
-      MultiRepo::Repo.new(repo_name)
+      repos_for(repo: repo_name, repo_set: repo_set, dry_run: dry_run).first
     end
 
     def self.common_options(optimist, only: %i[repo repo_set dry_run], except: nil, repo_set_default: "master")
