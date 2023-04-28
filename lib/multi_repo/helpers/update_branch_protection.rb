@@ -1,6 +1,6 @@
 module MultiRepo::Helpers
   class UpdateBranchProtection
-    attr_reader :repo_name, :branch, :dry_run
+    attr_reader :repo_name, :branch, :dry_run, :github
 
     def initialize(repo_name, branch:, dry_run: false, **)
       @repo_name = repo_name
