@@ -1,3 +1,5 @@
+require "active_support/core_ext/object/blank"
+
 module MultiRepo::Service
   class Git
     def self.client(path:, clone_source:)
