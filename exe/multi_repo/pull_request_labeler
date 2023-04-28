@@ -22,26 +22,26 @@ def github
   MultiRepo::Service::Github.client
 end
 
-def add_labels(github_repo, pr_number, labels:, dry_run:, **_)
+def add_labels(repo_name, pr_number, labels:, dry_run:, **_)
   labels = Array(labels)
   if dry_run
-    puts "** dry-run: github.add_labels_to_an_issue(#{github_repo.inspect}, #{pr_number.inspect}, #{labels.inspect})".light_black
+    puts "** dry-run: github.add_labels_to_an_issue(#{repo_name.inspect}, #{pr_number.inspect}, #{labels.inspect})".light_black
   else
-    github.add_labels_to_an_issue(github_repo, pr_number, labels)
+    github.add_labels_to_an_issue(repo_name, pr_number, labels)
   end
 end
 
-def remove_labels(github_repo, pr_number, labels:, dry_run:, **_)
+def remove_labels(repo_name, pr_number, labels:, dry_run:, **_)
   Array(labels).each do |label|
-    remove_label(github_repo, pr_number, label: label, dry_run: dry_run)
+    remove_label(repo_name, pr_number, label: label, dry_run: dry_run)
   end
 end
 
-def remove_label(github_repo, pr_number, label:, dry_run:, **_)
+def remove_label(repo_name, pr_number, label:, dry_run:, **_)
   if dry_run
-    puts "** dry-run: github.remove_label(#{github_repo.inspect}, #{pr_number.inspect}, #{label.inspect})".light_black
+    puts "** dry-run: github.remove_label(#{repo_name.inspect}, #{pr_number.inspect}, #{label.inspect})".light_black
   else
-    github.remove_label(github_repo, pr_number, label)
+    github.remove_label(repo_name, pr_number, label)
   end
 rescue Octokit::NotFound
   # Ignore labels that are not found, because we want them removed anyway
@@ -50,10 +50,10 @@ end
 opts[:prs].each do |pr|
   puts MultiRepo::CLI.header(pr)
 
-  github_repo, pr_number = PR_REGEX.match(pr).captures
+  repo_name, pr_number = PR_REGEX.match(pr).captures
 
-  add_labels(github_repo, pr_number, labels: opts[:add], **opts)
-  remove_labels(github_repo, pr_number, labels: opts[:remove], **opts)
+  add_labels(repo_name, pr_number, labels: opts[:add], **opts)
+  remove_labels(repo_name, pr_number, labels: opts[:remove], **opts)
 
   puts
 end
