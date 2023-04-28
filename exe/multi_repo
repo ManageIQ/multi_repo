@@ -1,0 +1,29 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." &>/dev/null && pwd)/scripts"
+
+usage() {
+  echo "Usage: multi_repo <script> [args]"
+  echo "  script      Script to run"
+  echo "  args        Arguments to pass to the script"
+  echo "  -h, --help  Show this help message"
+  echo
+  echo "Available scripts:"
+  for f in $(ls -1 "$SCRIPT_DIR" | sort); do
+    echo "  $f"
+  done
+}
+
+if [ -z "$1" -o "$1" = "--help" -o "$1" = "-h" ]; then
+  usage
+  exit
+fi
+
+if [ ! -f "$SCRIPT_DIR/$1" ]; then
+  echo "ERROR: script '$1' not found"
+  echo
+  usage
+  exit 1
+fi
+
+exec "$SCRIPT_DIR/$1" "${@:2}"
