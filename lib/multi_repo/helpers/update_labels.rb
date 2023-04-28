@@ -22,7 +22,7 @@ module MultiRepo::Helpers
           github.create_label(repo_name, label, color)
         elsif github_label.color.downcase != color.downcase
           puts "Updating #{label.inspect} to #{color.inspect}"
-          github.update_label(repo_name, label, color)
+          github.update_label(repo_name, label, color: color)
         end
       end
     end
