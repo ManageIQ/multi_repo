@@ -44,14 +44,15 @@ module MultiRepo::Service
       exit($?.exitstatus) unless system?(command, **kwargs)
     end
 
-    attr_accessor :registry, :cache, :dry_run
+    attr_accessor :registry, :default_headers, :cache, :dry_run
 
-    def initialize(registry: self.class.registry, cache: true, dry_run: false)
+    def initialize(registry: self.class.registry, default_headers: nil, cache: true, dry_run: false)
       require "rest-client"
       require "fileutils"
       require "json"
 
       @registry = registry
+      @default_headers = default_headers
 
       @cache   = cache
       @dry_run = dry_run
@@ -134,6 +135,8 @@ module MultiRepo::Service
 
     def request(verb, path, body: nil, headers: {}, verbose: true)
       path = File.join(registry, path)
+
+      headers = default_headers.merge(headers) if default_headers
 
       if dry_run && %i[delete put post patch].include?(verb)
         puts "+ dry_run: #{verb.to_s.upcase} #{path}".light_black if verbose
