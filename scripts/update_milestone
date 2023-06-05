@@ -14,7 +14,7 @@ opts = Optimist.options do
   MultiRepo::CLI.common_options(self)
 end
 Optimist.die(:due_on, "is required") if !opts[:close] && !opts[:due_on]
-Optimist.die(:due_on, "must be a date format") if opts[:due_on] && !MultiRepo::Service::GitHub.valid_milestone_date?(opts[:due_on])
+Optimist.die(:due_on, "must be a date format") if opts[:due_on] && !MultiRepo::Service::Github.valid_milestone_date?(opts[:due_on])
 
 MultiRepo::CLI.each_repo(**opts) do |repo|
   MultiRepo::Helpers::UpdateMilestone.new(repo.name, **opts).run

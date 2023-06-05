@@ -15,18 +15,20 @@ module MultiRepo::Helpers
     end
 
     def run
+      due_on_str = due_on.strftime("%Y-%m-%d").inspect
+
       existing = github.find_milestone_by_title(repo_name, title)
       if close
         if existing
           puts "Closing milestone #{title.inspect} (#{existing.number})"
-          github.close_milestone(repo.name, title, existing.number)
+          github.close_milestone(repo_name, title, existing.number)
         end
       elsif existing
-        puts "Updating milestone #{title.inspect} (#{existing.number}) with due date #{due_on_str.inspect}"
-        github.update_milestone(repo.name, existing.number, due_on)
+        puts "Updating milestone #{title.inspect} (#{existing.number}) with due date #{due_on_str}"
+        github.update_milestone(repo_name, existing.number, due_on)
       else
-        puts "Creating milestone #{title.inspect} with due date #{due_on_str.inspect}"
-        github.create_milestone(repo.name, title, due_on)
+        puts "Creating milestone #{title.inspect} with due date #{due_on_str}"
+        github.create_milestone(repo_name, title, due_on)
       end
     end
   end
