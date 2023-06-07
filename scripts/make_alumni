@@ -14,7 +14,7 @@ opts = Optimist.options do
 end
 
 class MultiRepo::MakeAlumni
-  attr_reader :org, :dry_run
+  attr_reader :org, :dry_run, :github
 
   def initialize(org:, dry_run:, **_)
     @org     = org
@@ -23,13 +23,14 @@ class MultiRepo::MakeAlumni
   end
 
   def run(user)
-    progress = MultiRepo.progress_bar(teams.size + repos.size)
+    progress = MultiRepo::CLI.progress_bar(teams.size + repos.size)
 
     github.add_team_membership(org, "alumni", user)
     progress.increment
 
-    non_alumni_teams = github.team_names(org) - ["alumni"]
-    non_alumni_teams.each do |team|
+    teams.each do |team|
+      next if team == "alumni"
+
       github.remove_team_membership(org, team, user)
       progress.increment
     end
@@ -40,6 +41,16 @@ class MultiRepo::MakeAlumni
     end
 
     progress.finish
+  end
+
+  private
+
+  def teams
+    @teams ||= github.team_names(org)
+  end
+
+  def repos
+    @repos ||= github.client.org_repos(org).reject(&:archived?).map(&:full_name).sort
   end
 end
 

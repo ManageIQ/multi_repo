@@ -71,12 +71,12 @@ module MultiRepo::Service
     end
 
     def self.team_ids_by_name(org)
-      @team_ids ||= {}
-      @team_ids[org] ||= client.org_teams(org).map { |t| [t.slug, t.id] }.sort.to_h
+      @team_ids_by_name ||= {}
+      @team_ids_by_name[org] ||= client.org_teams(org).map { |t| [t.slug, t.id] }.sort.to_h
     end
 
     def self.team_names(org)
-      team_ids(org).keys
+      team_ids_by_name(org).keys
     end
 
     def self.disabled_workflows(repo_name)
