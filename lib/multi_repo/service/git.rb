@@ -24,7 +24,7 @@ module MultiRepo::Service
 
       args = ["clone", clone_source, path]
       command = Shellwords.join(["git", *args])
-      command << " &>/dev/null" unless ENV["GIT_DEBUG"]
+      command << " >/dev/null 2>&1" unless ENV["GIT_DEBUG"]
       puts "+ #{command}" if ENV["GIT_DEBUG"] # Matches the output of MiniGit
 
       raise MiniGit::GitError.new(args, $?) unless system(command)
