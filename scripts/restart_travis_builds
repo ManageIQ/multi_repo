@@ -9,6 +9,8 @@ require 'travis'
 require 'travis/pro/auto_login'
 
 opts = Optimist.options do
+  synopsis "Restart all Travis builds for a given branch or tag for all GitHub repos."
+
   opt :ref, "The branch or release tag to rebuild.", :type => :string, :required => true
 
   MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)

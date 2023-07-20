@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Create or update labels on all GitHub repos."
+
   MultiRepo::CLI.common_options(self, :repo_set_default => nil)
 end
 opts[:repo] = MultiRepo::Labels.all.keys.sort unless opts[:repo] || opts[:repo_set]

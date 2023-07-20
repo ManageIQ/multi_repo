@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Destroy a tag on all local git repos."
+
   opt :tag, "The tag to destroy", :type => :string, :required => true
 
   MultiRepo::CLI.common_options(self, :except => :dry_run)

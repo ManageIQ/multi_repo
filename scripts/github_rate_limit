@@ -7,4 +7,8 @@ gemfile do
 end
 require "more_core_extensions/core_ext/array/tableize"
 
+Optimist.options do
+  synopsis "Display the current GitHub rate limit."
+end
+
 puts [MultiRepo::Service::Github.client.rate_limit.to_h].tableize

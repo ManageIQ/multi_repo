@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Apply the 'hacktoberfest' label to all 'good first issue' labels."
+
   opt :org,   "The organization to apply the `hacktoberfest` label to", :type => :string, :required => true
   opt :apply, "Apply the `hacktoberfest` label to `good first issue` labels. "\
               "Pass --no-apply to remove the `hacktoberfest` label",

@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Add or remove labels on a set of pull requests."
+
   opt :prs,    "The list of PRs to merge", :type => :strings, :required => true
   opt :add,    "Labels to add",            :type => :strings, :required => true
   opt :remove, "Labels to remove",         :type => :strings, :required => true

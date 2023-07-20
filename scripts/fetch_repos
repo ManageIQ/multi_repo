@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Fetch all repos."
+
   opt :checkout, "Branch to checkout after fetching.", :type => :string
 
   MultiRepo::CLI.common_options(self, :except => :dry_run)

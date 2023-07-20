@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Create a pull request on all repos."
+
   opt :base,    "The target branch for the changes.",                         :type => :string, :required => true
   opt :head,    "The name of the branch to create on your fork.",             :type => :string, :required => true
   opt :script,  "The path to the script that will update the desired files.", :type => :string, :required => true

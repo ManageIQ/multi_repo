@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "List all repos in a repo set."
+
   MultiRepo::CLI.common_options(self, :only => :repo_set)
 end
 

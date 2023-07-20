@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Show all issues in a GitHub project column."
+
   opt :project_id, "The project ID",                :type => :integer, :required => true
   opt :column,     "The column within the project", :type => :string,  :required => true
 

@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Merge a set of pull requests, also setting assignee and labels."
+
   opt :prs,      "The list of PRs to merge",           :type => :strings, :required => true
   opt :assignee, "GitHub user to assign when merging", :type => :string,  :required => true
   opt :labels,   "Labels to apply when merging",       :type => :strings

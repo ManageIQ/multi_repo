@@ -2,16 +2,26 @@
 
 SCRIPT_DIR = File.expand_path("../scripts", __dir__)
 
+def available_scripts
+  @available_scripts ||= Dir.children(SCRIPT_DIR).sort.to_h do |script|
+    desc = File.read(File.join(SCRIPT_DIR, script)).match(/synopsis(?:\(|\s+)['"](.*)['"]/)&.captures&.first
+    [script, desc]
+  end
+end
+
 def usage
   puts "Usage: multi_repo <script> [args]"
   puts "  script      Script to run"
   puts "  args        Arguments to pass to the script"
   puts "  -h, --help  Show this help message"
-
-  available_scripts = Dir.children(SCRIPT_DIR).sort.map { |f| "  #{f}"}
+  puts
+  puts "For help on a specific script, run:"
+  puts "  multi_repo <script> --help"
   puts
   puts "Available scripts:"
-  puts available_scripts
+
+  justify = available_scripts.keys.map(&:length).max + 2
+  puts available_scripts.map { |script, desc| "  #{script.ljust(justify)} #{desc}" }.join("\n")
 end
 
 script, args = ARGV[0], ARGV[1..]

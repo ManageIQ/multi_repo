@@ -11,6 +11,8 @@ require "active_support/core_ext/string/inflections"
 DISPLAY_FORMATS = %w[commit pr-title pr-label]
 
 opts = Optimist.options do
+  synopsis "Show the git commit log between two refs for all git repos."
+
   opt :from,    "The commit log 'from' ref", :type => :string,  :required => true
   opt :to,      "The commit log 'to' ref" ,  :type => :string,  :required => true
   opt :display, "How to display the history. Valid values are: #{DISPLAY_FORMATS.join(", ")}", :default => "commit"

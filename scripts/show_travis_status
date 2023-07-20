@@ -13,6 +13,8 @@ require 'travis'
 require 'travis/pro/auto_login'
 
 opts = Optimist.options do
+  synopsis "Show the Travis status for a branch or tag for all GitHub repos."
+
   opt :ref, "The branch or release tag to check status for.", :type => :string, :required => true
 
   MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)

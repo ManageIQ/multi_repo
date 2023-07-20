@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Create a stub for a new Ruby gem on rubygems.org."
+
   opt :owners, "Owners to add to the gem stub", :type => :strings, :default => []
 
   MultiRepo::CLI.common_options(self, :except => :repo_set)

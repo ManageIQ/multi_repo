@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Update repo settings in all GitHub repos."
+
   MultiRepo::CLI.common_options(self)
 end
 
