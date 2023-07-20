@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "List all repos in an org."
+
   opt :org, "The org to list the repos for", :type => :string, :required => true
 end
 

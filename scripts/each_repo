@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Run a command in each repo."
+
   opt :command, "A command to run in each repo", :type => :string, :required => true
   opt :ref, "Ref to checkout before running the command", :type => :string, :default => "master"
 

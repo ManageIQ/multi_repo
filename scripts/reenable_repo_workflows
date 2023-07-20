@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Reenable all disabled workflows in an org."
+
   opt :org, "The organization to reenable workflows in", :type => :string, :required => true
   opt :extra_repos, "Extra repos to reenable workflows in", :type => :strings, :default => []
 

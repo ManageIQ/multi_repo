@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Show all members of an org."
+
   opt :org,    "The org to list the users for",    :type => :string, :required => true
   opt :team,   "Show members of a specific team",  :type => :string
   opt :alumni, "Whether or not to include alumni", :default => false

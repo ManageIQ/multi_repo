@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Move a set of GitHub team members to an 'alumni' team."
+
   opt :users, "The users to make alumni.",     :type => :strings, :required => true
   opt :org,   "The org in which user belongs", :type => :string,  :required => true
 

@@ -8,6 +8,8 @@ end
 require 'more_core_extensions/core_ext/array/tableize'
 
 opts = Optimist.options do
+  synopsis "Show the commit for a tag in all git repos."
+
   opt :tag, "The tag name.", :type => :string, :required => true
 
   MultiRepo::CLI.common_options(self, :except => :dry_run, :repo_set_default => nil)

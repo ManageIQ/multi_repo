@@ -6,4 +6,8 @@ gemfile do
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
 end
 
+Optimist.options do
+  synopsis "Mirror all GitHub repos into another org."
+end
+
 exit 1 unless MultiRepo::Helpers::GitMirror.new.mirror_all

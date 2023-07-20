@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Create, update, or close a milestone in all GitHub repos."
+
   opt :title,  "The milestone title.",            :type => :string, :required => true
   opt :due_on, "The due date.",                   :type => :string
   opt :close,  "Whether to close the milestone.", :default => false

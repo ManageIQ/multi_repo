@@ -7,6 +7,8 @@ gemfile do
 end
 
 opts = Optimist.options do
+  synopsis "Update the branch protection for all GitHub repos."
+
   opt :branch, "The branch to protect.", :type => :string, :required => true
 
   MultiRepo::CLI.common_options(self, :repo_set_default => nil)
