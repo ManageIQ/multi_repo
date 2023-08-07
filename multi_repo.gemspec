@@ -36,8 +36,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rest-client"
   spec.add_runtime_dependency "travis"
 
-  # config gem brings in newer versions of dry-configurable that are not compatible with Ruby 2.7
+  # config gem brings in newer versions of dry-core and dry-configurable that are not compatible with Ruby 2.7
   spec.add_runtime_dependency "dry-configurable", "= 1.0.1"
+  spec.add_runtime_dependency "dry-core", "= 1.0.0"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "manageiq-style"
