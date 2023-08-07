@@ -3,6 +3,7 @@ module MultiRepo::Helpers
     def initialize
       require "colorize"
       require "config"
+      require "fileutils"
 
       @errors_occurred = false
     end
