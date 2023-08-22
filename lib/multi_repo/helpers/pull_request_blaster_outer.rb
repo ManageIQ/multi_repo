@@ -57,7 +57,7 @@ module MultiRepo::Helpers
     end
 
     def forked?
-      github.client.repos(github.client.login).any? { |m| m.name == repo.name }
+      github.client.repos(github.client.login).any? { |m| m.name.split("/").last == repo.name.split("/").last }
     end
 
     def fork_repo
@@ -104,7 +104,7 @@ module MultiRepo::Helpers
     end
 
     def origin_url
-      "git@github.com:#{github.client.login}/#{repo.name}.git"
+      "git@github.com:#{github.client.login}/#{repo.name.split("/").last}.git"
     end
 
     def pr_head
