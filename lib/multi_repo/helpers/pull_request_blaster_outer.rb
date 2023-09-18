@@ -9,8 +9,7 @@ module MultiRepo::Helpers
       @base    = base
       @head    = head
       @script  = begin
-        s = Pathname.new(script)
-        s = Pathname.new(Dir.pwd).join(script) if s.relative?
+        s = Pathname.new(script).expand_path
         raise "File not found #{s}" unless s.exist?
         s.to_s
       end
@@ -20,12 +19,10 @@ module MultiRepo::Helpers
     end
 
     def blast
-      puts "+++ blasting #{repo.name}..."
-
       repo.git.fetch
 
       unless repo.git.remote_branch?("origin", base)
-        puts "!!! Skipping #{repo.name}: 'origin/#{base}' not found"
+        puts "!! Skipping #{repo.name}: 'origin/#{base}' not found".light_yellow
         return
       end
 
@@ -33,20 +30,31 @@ module MultiRepo::Helpers
       run_script
 
       result = false
-      if !commit_changes
-        puts "!!! Failed to commit changes. Perhaps the script is wrong or #{repo.name} is already updated."
-      elsif dry_run
-        result = "Committed but is dry run"
+      if !changes_found?
+        puts
+        puts "!! Skipping #{repo.name}: No changes found".light_yellow
+        result = "no changes".light_yellow
       else
-        puts "Do you want to open a pull request on #{repo.name} with the above changes? (Y/N)"
-        answer = $stdin.gets.chomp
-        if answer.upcase.start_with?("Y")
-          fork_repo unless forked?
-          push_branch
-          result = open_pull_request
+        commit_changes
+        show_commit
+        puts
+
+        if dry_run
+          puts "** dry-run: Skipping opening pull request".light_black
+          result = "dry run".light_black
+        else
+          print "Do you want to open a pull request on #{repo.name} with the above changes? (y/N): "
+          answer = $stdin.gets.chomp
+          if answer.upcase.start_with?("Y")
+            fork_repo unless forked?
+            push_branch
+            result = open_pull_request
+          else
+            puts "!! Skipping #{repo.name}: User ignored".light_yellow
+            result = "ignored".light_yellow
+          end
         end
       end
-      puts "--- blasting #{repo.name} complete"
       result
     end
 
@@ -57,7 +65,9 @@ module MultiRepo::Helpers
     end
 
     def forked?
-      github.client.repos(github.client.login).any? { |m| m.name == repo.name }
+      # NOTE: There is an assumption here that the fork's name will match the source's name.
+      #   Ideally there would be a "forked from" field in the repo metadata, but there isn't.
+      github.client.repos(github.client.login, :type => "forks").any? { |m| m.name == repo.short_name }
     end
 
     def fork_repo
@@ -70,41 +80,41 @@ module MultiRepo::Helpers
 
     def run_script
       repo.chdir do
-        parts = []
-        parts << "GITHUB_REPO=#{repo.name}"
-        parts << "DRY_RUN=true" if dry_run
-        parts << script
-        cmd = parts.join(" ")
+        Bundler.with_unbundled_env do
+          parts = []
+          parts << "GITHUB_REPO=#{repo.name}"
+          parts << "DRY_RUN=true" if dry_run
+          parts << script
+          cmd = parts.join(" ")
 
-        unless system(cmd)
-          puts "!!! Script execution failed."
-          exit $?.exitstatus
+          unless system(cmd)
+            puts "!! Script execution failed.".light_red
+            exit $?.exitstatus
+          end
         end
       end
+    end
+
+    def changes_found?
+      repo.git.client.capturing.status("--porcelain").chomp.present?
     end
 
     def commit_changes
-      repo.chdir do
-        begin
-          repo.git.client.add("-v", ".")
-          repo.git.client.commit("-m", message)
-          repo.git.client.show
-          if dry_run
-            puts "!!! --dry-run enabled: If the above commit in #{repo.path} looks good, run again without dry run to fork the repo, push the branch and open a pull request."
-          end
-          true
-        rescue MiniGit::GitError => e
-          e.status.exitstatus == 0
-        end
-      end
+      repo.git.client.add("-v", ".")
+      repo.git.client.commit("-m", message)
     end
 
-    def origin_remote
+    def show_commit
+      repo.git.client.show
+    end
+
+    def blast_remote
       "pr_blaster_outer"
     end
 
-    def origin_url
-      "git@github.com:#{github.client.login}/#{repo.name}.git"
+    def blast_remote_url
+      # NOTE: Similar to `forked?`, there is an assumption here that the fork's name will match the source's name.
+      "git@github.com:#{github.client.login}/#{repo.short_name}.git"
     end
 
     def pr_head
@@ -112,10 +122,8 @@ module MultiRepo::Helpers
     end
 
     def push_branch
-      repo.chdir do
-        repo.git.client.remote("add", origin_remote, origin_url) unless repo.git.remote?(origin_remote)
-        repo.git.client.push("-f", origin_remote, "#{head}:#{head}")
-      end
+      repo.git.client.remote("add", blast_remote, blast_remote_url) unless repo.git.remote?(blast_remote)
+      repo.git.client.push("-f", blast_remote, "#{head}:#{head}")
     end
 
     def open_pull_request
@@ -123,7 +131,7 @@ module MultiRepo::Helpers
       pr.html_url
     rescue => err
       raise unless err.message.include?("A pull request already exists")
-      puts "!!! Skipping.  #{err.message}"
+      puts "!! Skipping #{repo.name}: #{err.message}".light_yellow
     end
   end
 end
