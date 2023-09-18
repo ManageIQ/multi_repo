@@ -48,7 +48,15 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
     end
     results["other"] = []
 
-    log = repo.git.client.capturing.log({:oneline => true}, range)
+    log =
+      begin
+        repo.git.client.capturing.log({:oneline => true}, range)
+      rescue MiniGit::GitError
+        puts "ERROR: commit range not found.".light_red
+        puts
+        next
+      end
+
     log.lines.each do |line|
       next unless (match = line.match(/Merge pull request #(\d+)\b/))
 
@@ -71,7 +79,15 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
 
     repos_with_changes << repo if changes_found
   when "commit"
-    output = repo.git.client.capturing.log({:oneline => true, :decorate => true, :graph => true}, range)
+    output =
+      begin
+        repo.git.client.capturing.log({:oneline => true, :decorate => true, :graph => true}, range)
+      rescue MiniGit::GitError
+        puts "ERROR: commit range not found.".light_red
+        puts
+        next
+      end
+
     puts output
     repos_with_changes << repo if output.present?
   end
