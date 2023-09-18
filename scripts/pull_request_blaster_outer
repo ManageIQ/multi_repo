@@ -4,7 +4,9 @@ require "bundler/inline"
 gemfile do
   source "https://rubygems.org"
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
+  gem "more_core_extensions"
 end
+require "more_core_extensions/core_ext/array/tableize"
 
 opts = Optimist.options do
   synopsis "Create a pull request on all repos."
@@ -19,8 +21,11 @@ opts = Optimist.options do
 end
 
 results = {}
-MultiRepo::CLI.each_repo(**opts) do |repo|
-  results[repo.name] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
+begin
+  MultiRepo::CLI.each_repo(**opts) do |repo|
+    results[repo.name] = MultiRepo::Helpers::PullRequestBlasterOuter.new(repo, **opts).blast
+  end
+ensure
+  puts "Summary:"
+  puts results.to_a.tableize(:header => false) unless results.empty?
 end
-
-pp results
