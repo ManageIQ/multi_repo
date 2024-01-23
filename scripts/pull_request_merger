@@ -57,9 +57,9 @@ opts[:prs].each do |pr|
 
   repo_name, pr_number = PR_REGEX.match(pr).captures
 
-  merge_pull_request(repo_name, pr_number, opts)
-  add_labels(repo_name, pr_number, opts) if opts[:labels].present?
-  assign_user(repo_name, pr_number, opts)
+  merge_pull_request(repo_name, pr_number, **opts)
+  add_labels(repo_name, pr_number, **opts) if opts[:labels].present?
+  assign_user(repo_name, pr_number, **opts)
 
   puts
 end
