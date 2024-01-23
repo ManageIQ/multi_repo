@@ -17,7 +17,7 @@ module MultiRepo::Service
     def self.ensure_small_image
       return @has_small_image if defined?(@has_small_image)
 
-      return false unless system?("docker pull #{SMALL_IMAGE} &>/dev/null")
+      return false unless system?("docker pull #{SMALL_IMAGE} >/dev/null 2>&1")
 
       @has_small_image = true
     end
