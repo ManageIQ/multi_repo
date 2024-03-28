@@ -212,17 +212,19 @@ module MultiRepo::Service
       payload = encode_secret(repo_name, value)
 
       if dry_run
-        puts "** dry-run: github.create_or_update_secret(#{repo_name.inspect}, #{key.inspect}, #{payload.inspect})".light_black
+        puts "** dry-run: github.create_or_update_actions_secret(#{repo_name.inspect}, #{key.inspect}, #{payload.inspect})".light_black
       else
-        client.create_or_update_secret(repo_name, key, payload)
+        client.create_or_update_actions_secret(repo_name, key, payload)
       end
     end
 
     private def encode_secret(repo_name, value)
+      raise ArgumentError, "value to encode cannot be nil" if value.nil?
+
       require "rbnacl"
       require "base64"
 
-      repo_public_key = client.get_public_key(repo_name)
+      repo_public_key = client.get_actions_public_key(repo_name)
       decoded_repo_public_key = Base64.decode64(repo_public_key.key)
       public_key = RbNaCl::PublicKey.new(decoded_repo_public_key)
       box = RbNaCl::Boxes::Sealed.from_public_key(public_key)
