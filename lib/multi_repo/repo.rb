@@ -5,11 +5,11 @@ module MultiRepo
     attr_reader :name, :config, :path
     attr_accessor :dry_run
 
-    def initialize(name, config: nil, dry_run: false)
+    def initialize(name, path: nil, config: nil, dry_run: false)
       @name    = name
       @dry_run = dry_run
       @config  = OpenStruct.new(config || {})
-      @path    = MultiRepo.repos_dir.join(name)
+      @path    = path || MultiRepo.repos_dir.join(name)
     end
 
     alias to_s inspect
