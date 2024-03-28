@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "licensee"
   spec.add_runtime_dependency "minigit"
   spec.add_runtime_dependency "more_core_extensions"
-  spec.add_runtime_dependency "octokit", ">=4.23.0"
+  spec.add_runtime_dependency "octokit", ">= 7.0.0"
   spec.add_runtime_dependency "optimist"
   spec.add_runtime_dependency "progressbar"
   spec.add_runtime_dependency "psych", ">=3"
