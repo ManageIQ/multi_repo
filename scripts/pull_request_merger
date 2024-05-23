@@ -20,46 +20,23 @@ end
 PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
 Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
 
-def merge_pull_request(repo_name, pr_number, dry_run:, **_)
-  if dry_run
-    puts "** dry-run: github.merge_pull_request(#{repo_name.inspect}, #{pr_number.inspect})".light_black
-  else
-    begin
-      MultiRepo::Service::Github.client.merge_pull_request(repo_name, pr_number)
-    rescue Octokit::MethodNotAllowed => err
-      raise unless err.to_s.include?("Pull Request is not mergeable")
-
-      puts "** WARN: Pull Request is not mergeable"
-    end
-  end
-end
-
-def add_labels(repo_name, pr_number, labels:, dry_run:, **_)
-  labels = Array(labels)
-  if dry_run
-    puts "** dry-run: github.add_labels_to_an_issue(#{repo_name.inspect}, #{pr_number.inspect}, #{labels.inspect})".light_black
-  else
-    MultiRepo::Service::Github.client.add_labels_to_an_issue(repo_name, pr_number, labels)
-  end
-end
-
-def assign_user(repo_name, pr_number, assignee:, dry_run:, **_)
-  assignee = assignee[1..] if assignee.start_with?("@")
-  if dry_run
-    puts "** dry-run: github.update_issue(#{repo_name.inspect}, #{pr_number.inspect}, \"assignee\" => #{assignee.inspect})".light_black
-  else
-    MultiRepo::Service::Github.client.update_issue(repo_name, pr_number, "assignee" => assignee)
-  end
-end
+github = MultiRepo::Service::Github.new(:dry_run => opts[:dry_run])
 
 opts[:prs].each do |pr|
   puts MultiRepo::CLI.header(pr)
 
   repo_name, pr_number = PR_REGEX.match(pr).captures
 
-  merge_pull_request(repo_name, pr_number, **opts)
-  add_labels(repo_name, pr_number, **opts) if opts[:labels].present?
-  assign_user(repo_name, pr_number, **opts)
+  begin
+    github.merge_pull_request(repo_name, pr_number)
+  rescue Octokit::MethodNotAllowed => err
+    raise unless err.to_s.include?("Pull Request is not mergeable")
+
+    puts "** WARN: Pull Request is not mergeable".light_yellow
+  end
+
+  github.add_labels_to_an_issue(repo_name, pr_number, opts[:labels]) if opts[:labels].present?
+  github.assign_user(repo_name, pr_number, opts[:assignee])
 
   puts
 end

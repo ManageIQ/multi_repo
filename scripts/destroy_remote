@@ -20,9 +20,5 @@ MultiRepo::CLI.each_repo(**opts) do |repo|
     next
   end
 
-  if opts[:dry_run]
-    puts "** dry-run: git remote rm #{opts[:remote]}".light_black
-  else
-    repo.git.client.remote("rm", opts[:remote])
-  end
+  repo.git.destroy_remote(opts[:remote])
 end

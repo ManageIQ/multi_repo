@@ -28,51 +28,16 @@ end
 PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
 Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
 
-def github
-  MultiRepo::Service::Github.client
-end
-
-def add_labels(repo_name, pr_number, labels:, dry_run:, **_)
-  labels = Array(labels)
-  if dry_run
-    puts "** dry-run: github.add_labels_to_an_issue(#{repo_name.inspect}, #{pr_number.inspect}, #{labels.inspect})".light_black
-  else
-    github.add_labels_to_an_issue(repo_name, pr_number, labels)
-  end
-end
-
-def remove_labels(repo_name, pr_number, labels:, dry_run:, **_)
-  Array(labels).each do |label|
-    remove_label(repo_name, pr_number, label: label, dry_run: dry_run)
-  end
-end
-
-def remove_label(repo_name, pr_number, label:, dry_run:, **_)
-  if dry_run
-    puts "** dry-run: github.remove_label(#{repo_name.inspect}, #{pr_number.inspect}, #{label.inspect})".light_black
-  else
-    github.remove_label(repo_name, pr_number, label)
-  end
-rescue Octokit::NotFound
-  # Ignore labels that are not found, because we want them removed anyway
-end
-
-def add_comment(repo_name, pr_number, body, dry_run:, **_)
-  if dry_run
-    puts "** dry_run: github.add_comment(#{repo_name.inspect}, #{pr_number.inspect}, #{body.pretty_inspect})".light_black
-  else
-    github.add_comment(repo_name, pr_number, body)
-  end
-end
+github = MultiRepo::Service::Github.new(:dry_run => opts[:dry_run])
 
 opts[:prs].each do |pr|
   puts MultiRepo::CLI.header(pr)
 
   repo_name, pr_number = PR_REGEX.match(pr).captures
 
-  add_labels(repo_name, pr_number, labels: opts[:add], **opts) if opts[:add]
-  remove_labels(repo_name, pr_number, labels: opts[:remove], **opts) if opts[:remove]
-  add_comment(repo_name, pr_number, opts[:comment], **opts) if opts[:comment]
+  github.add_labels_to_an_issue(repo_name, pr_number, opts[:add]) if opts[:add].present?
+  github.remove_labels_from_an_issue(repo_name, pr_number, opts[:remove]) if opts[:remove].present?
+  github.add_comment(repo_name, pr_number, opts[:comment]) if opts[:comment].present?
 
   puts
 end
