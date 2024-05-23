@@ -9,14 +9,22 @@ end
 opts = Optimist.options do
   synopsis "Add or remove labels on a set of pull requests."
 
-  opt :prs,    "The list of PRs to merge", :type => :strings, :required => true
-  opt :add,    "Labels to add",            :type => :strings, :required => true
-  opt :remove, "Labels to remove",         :type => :strings, :required => true
+  opt :prs,    "The list of PRs to label", :type => :strings, :required => true
+  opt :add,    "Labels to add",            :type => :strings
+  opt :remove, "Labels to remove",         :type => :strings
+
+  opt :comment, "Comment explaining the label change", :type => :string
 
   MultiRepo::CLI.common_options(self, :only => :dry_run)
 end
 
-# TODO: Normalize any PR format to `org/repo#pr`
+Optimist.die "at least one of --add or --remove is required" unless opts[:add_given] || opts[:remove_given]
+
+# Normalize any PR format to `org/repo#pr`
+opts[:prs].map! do |pr|
+  pr.sub("https://github.com/", "").sub("/pull/", "#")
+end
+
 PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
 Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
 
@@ -49,13 +57,22 @@ rescue Octokit::NotFound
   # Ignore labels that are not found, because we want them removed anyway
 end
 
+def add_comment(repo_name, pr_number, body, dry_run:, **_)
+  if dry_run
+    puts "** dry_run: github.add_comment(#{repo_name.inspect}, #{pr_number.inspect}, #{body.pretty_inspect})".light_black
+  else
+    github.add_comment(repo_name, pr_number, body)
+  end
+end
+
 opts[:prs].each do |pr|
   puts MultiRepo::CLI.header(pr)
 
   repo_name, pr_number = PR_REGEX.match(pr).captures
 
-  add_labels(repo_name, pr_number, labels: opts[:add], **opts)
-  remove_labels(repo_name, pr_number, labels: opts[:remove], **opts)
+  add_labels(repo_name, pr_number, labels: opts[:add], **opts) if opts[:add]
+  remove_labels(repo_name, pr_number, labels: opts[:remove], **opts) if opts[:remove]
+  add_comment(repo_name, pr_number, opts[:comment], **opts) if opts[:comment]
 
   puts
 end
