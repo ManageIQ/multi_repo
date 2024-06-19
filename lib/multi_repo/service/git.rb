@@ -83,6 +83,17 @@ module MultiRepo::Service
       true
     end
 
+    def destroy_remote(remote)
+      if dry_run
+        puts "** dry-run: git remote rm #{remote}".light_black
+      else
+        client.remote("rm", remote)
+      end
+    rescue MiniGit::GitError
+      # Ignore missing remotes because we want them destroyed anyway
+      nil
+    end
+
     def remote_branch?(remote, branch)
       client.capturing.ls_remote(remote, branch).present?
     end

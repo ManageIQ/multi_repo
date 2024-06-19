@@ -138,6 +138,44 @@ module MultiRepo::Service
       end
     end
 
+    def add_labels_to_an_issue(repo_name, issue_number, labels)
+      labels = Array(labels)
+      if dry_run
+        puts "** dry-run: github.add_labels_to_an_issue(#{repo_name.inspect}, #{issue_number.inspect}, #{labels.inspect})".light_black
+      else
+        client.add_labels_to_an_issue(repo_name, issue_number, labels)
+      end
+    end
+
+    def remove_labels_from_an_issue(repo_name, issue_number, labels)
+      Array(labels).each do |label|
+        if dry_run
+          puts "** dry-run: github.remove_label(#{repo_name.inspect}, #{issue_number.inspect}, #{label.inspect})".light_black
+        else
+          client.remove_label(repo_name, issue_number, label)
+        end
+      rescue Octokit::NotFound
+        # Ignore labels that are not found, because we want them removed anyway
+      end
+    end
+
+    def add_comment(repo_name, issue_number, body)
+      if dry_run
+        puts "** dry-run: github.add_comment(#{repo_name.inspect}, #{issue_number.inspect}, #{body.pretty_inspect})".light_black
+      else
+        client.add_comment(repo_name, issue_number, body)
+      end
+    end
+
+    def assign_user(repo_name, issue_number, assignee)
+      assignee = assignee[1..] if assignee.start_with?("@")
+      if dry_run
+        puts "** dry-run: github.update_issue(#{repo_name.inspect}, #{issue_number.inspect}, \"assignee\" => #{assignee.inspect})".light_black
+      else
+        client.update_issue(repo_name, issue_number, "assignee" => assignee)
+      end
+    end
+
     def create_milestone(repo_name, title, due_on)
       if dry_run
         puts "** dry-run: github.create_milestone(#{repo_name.inspect}, #{title.inspect}, :due_on => #{due_on.strftime("%Y-%m-%d").inspect})".light_black
@@ -205,6 +243,14 @@ module MultiRepo::Service
         puts "** dry-run: github.put(#{command.inspect})".light_black
       else
         client.put(command)
+      end
+    end
+
+    def merge_pull_request(repo_name, pr_number)
+      if dry_run
+        puts "** dry-run: github.merge_pull_request(#{repo_name.inspect}, #{pr_number.inspect})".light_black
+      else
+        client.merge_pull_request(repo_name, pr_number)
       end
     end
 
