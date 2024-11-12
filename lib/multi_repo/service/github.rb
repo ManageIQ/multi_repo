@@ -83,6 +83,24 @@ module MultiRepo::Service
       client.workflows(repo_name)[:workflows].select { |w| w.state == "disabled_inactivity" }
     end
 
+    PR_REGEX = %r{^([^/#]+/[^/#]+)#(\d+)$}
+
+    # Parse a list of PRs that are in URL or org/repo#pr format into a Array of
+    # [repo_name, pr_number] entries.
+    def self.parse_prs(*prs)
+      prs.flatten.map do |pr|
+        # Normalize to org/repo#pr
+        normalized_pr = pr.sub("https://github.com/", "").sub("/pull/", "#")
+
+        if (match = PR_REGEX.match(normalized_pr))
+          repo_name, pr_number = match.captures
+          [repo_name, pr_number.to_i]
+        else
+          raise ArgumentError, "Invalid PR '#{pr}'. PR must be a GitHub URL or in org/repo#pr format."
+        end
+      end
+    end
+
     attr_reader :dry_run
 
     def initialize(dry_run: false)
@@ -161,7 +179,7 @@ module MultiRepo::Service
 
     def add_comment(repo_name, issue_number, body)
       if dry_run
-        puts "** dry-run: github.add_comment(#{repo_name.inspect}, #{issue_number.inspect}, #{body.pretty_inspect})".light_black
+        puts "** dry-run: github.add_comment(#{repo_name.inspect}, #{issue_number.inspect}, #{body.pretty_inspect.chomp})".light_black
       else
         client.add_comment(repo_name, issue_number, body)
       end

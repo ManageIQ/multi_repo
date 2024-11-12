@@ -20,20 +20,17 @@ end
 
 Optimist.die "at least one of --add or --remove is required" unless opts[:add_given] || opts[:remove_given]
 
-# Normalize any PR format to `org/repo#pr`
-opts[:prs].map! do |pr|
-  pr.sub("https://github.com/", "").sub("/pull/", "#")
-end
-
-PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
-Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
+prs =
+  begin
+    MultiRepo::Service::Github.parse_prs(opts[:prs])
+  rescue ArgumentError => err
+    Optimist.die :prs, err.message
+  end
 
 github = MultiRepo::Service::Github.new(:dry_run => opts[:dry_run])
 
-opts[:prs].each do |pr|
-  puts MultiRepo::CLI.header(pr)
-
-  repo_name, pr_number = PR_REGEX.match(pr).captures
+prs.each do |repo_name, pr_number|
+  puts MultiRepo::CLI.header("#{repo_name}##{pr_number}")
 
   github.add_labels_to_an_issue(repo_name, pr_number, opts[:add]) if opts[:add].present?
   github.remove_labels_from_an_issue(repo_name, pr_number, opts[:remove]) if opts[:remove].present?
