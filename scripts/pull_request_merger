@@ -16,16 +16,17 @@ opts = Optimist.options do
   MultiRepo::CLI.common_options(self)
 end
 
-# TODO: Normalize any PR format to `org/repo#pr`
-PR_REGEX = %r{^([^/#]+/[^/#]+)#([^/#]+)$}
-Optimist.die :prs, "must be in the form `org/repo#pr`" unless opts[:prs].all? { |pr| pr.match?(PR_REGEX) }
+prs =
+  begin
+    MultiRepo::Service::Github.parse_prs(opts[:prs])
+  rescue ArgumentError => err
+    Optimist.die :prs, err.message
+  end
 
 github = MultiRepo::Service::Github.new(:dry_run => opts[:dry_run])
 
-opts[:prs].each do |pr|
-  puts MultiRepo::CLI.header(pr)
-
-  repo_name, pr_number = PR_REGEX.match(pr).captures
+prs.each do |repo_name, pr_number|
+  puts MultiRepo::CLI.header("#{repo_name}##{pr_number}")
 
   begin
     github.merge_pull_request(repo_name, pr_number)
