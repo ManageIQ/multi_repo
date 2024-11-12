@@ -60,7 +60,12 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
     log.lines.each do |line|
       next unless (match = line.match(/Merge pull request #(\d+)\b/))
 
-      pr = github.pull_request(repo.name, match[1])
+      pr =
+        begin
+          github.pull_request(repo.name, match[1])
+        rescue Octokit::NotFound
+          next # PR not found could mean this was a cherry-pick from a different repo, so the PR doesn't exist.
+        end
       label = pr.labels.detect { |l| results.key?(l.name) }&.name || "other"
       results[label] << pr
     end
