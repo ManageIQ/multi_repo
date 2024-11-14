@@ -29,6 +29,13 @@ module MultiRepo::Service
         }.compact
 
         require 'octokit'
+
+        if ENV["DEBUG"]
+          middleware = Octokit.middleware.dup
+          middleware.response :logger
+          Octokit.middleware = middleware
+        end
+
         Octokit::Client.new(params)
       end
     end
