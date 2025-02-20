@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-02-20
+### Added
+- Add debugging of octokit request/response if DEBUG env var set [[#38](https://github.com/ManageIQ/multi_repo/pull/38)]
+
+### Fixed
+- Pin json gem to 2.9.1 since 2.10.0+ is broken [[#41](https://github.com/ManageIQ/multi_repo/pull/41)]
+
 ## [0.5.0] - 2024-11-12
 ### Added
 - [pull_request_labeler] Add ability to also add a comment about why the labels are changing [[#30](https://github.com/ManageIQ/multi_repo/pull/30)]
@@ -33,7 +40,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [show_commit_history] Prevent missing ranges from failing the entire run [[#20](https://github.com/ManageIQ/multi_repo/pull/20)]
 - [pull_request_merger] Fixing issue passing kwargs on Ruby 3 [[#23](https://github.com/ManageIQ/multi_repo/pull/23)]
 
-[Unreleased]: https://github.com/ManageIQ/more_core_extensions/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/ManageIQ/more_core_extensions/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/ManageIQ/more_core_extensions/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/ManageIQ/more_core_extensions/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/ManageIQ/more_core_extensions/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/ManageIQ/more_core_extensions/compare/v0.3.0...v0.3.1
