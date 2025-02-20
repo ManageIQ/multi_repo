@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activesupport"
   spec.add_runtime_dependency "colorize"
   spec.add_runtime_dependency "config"
+  spec.add_runtime_dependency "json", "~> 2.9.1" # Pin json due to https://github.com/ruby/json/issues/752
   spec.add_runtime_dependency "licensee"
   spec.add_runtime_dependency "minigit"
   spec.add_runtime_dependency "more_core_extensions"
