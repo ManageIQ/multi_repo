@@ -2,9 +2,9 @@ require 'pathname'
 
 module MultiRepo::Helpers
   class PullRequestBlasterOuter
-    attr_reader :repo, :base, :head, :script, :dry_run, :message, :title
+    attr_reader :repo, :base, :head, :script, :dry_run, :message, :title, :force
 
-    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, **)
+    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, force: false, **)
       @repo    = repo
       @base    = base
       @head    = head
@@ -16,6 +16,7 @@ module MultiRepo::Helpers
       @dry_run = dry_run
       @message = message
       @title   = (title || message)[0, 72]
+      @force   = force
     end
 
     def blast
@@ -43,8 +44,14 @@ module MultiRepo::Helpers
           puts "** dry-run: Skipping opening pull request".light_black
           result = "dry run".light_black
         else
-          print "Do you want to open a pull request on #{repo.name} with the above changes? (y/N): "
-          answer = $stdin.gets.chomp
+          answer =
+            if force
+              "Y"
+            else
+              print "Do you want to open a pull request on #{repo.name} with the above changes? (y/N): "
+              $stdin.gets.chomp
+            end
+
           if answer.upcase.start_with?("Y")
             fork_repo unless forked?
             push_branch
