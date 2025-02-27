@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-02-27
+### Added
+- [pull_request_blaster_outer] Option to force creation of the pull request without asking [[#40](https://github.com/ManageIQ/multi_repo/pull/40)]
+
 ## [0.5.1] - 2025-02-20
 ### Added
 - Add debugging of octokit request/response if DEBUG env var set [[#38](https://github.com/ManageIQ/multi_repo/pull/38)]
