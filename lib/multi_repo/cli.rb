@@ -1,6 +1,7 @@
 require "multi_repo"
 require "optimist"
 require "colorize"
+require "more_core_extensions/core_ext/array/deletes"
 
 module MultiRepo
   module CLI
@@ -15,14 +16,15 @@ module MultiRepo
     end
 
     def self.repos_for(repo: nil, repo_set: nil, dry_run: false, **_)
-      Optimist.die("options --repo or --repo_set must be specified") unless repo || repo_set
+      repo = Array(repo).delete_blanks
+      Optimist.die("options --repo or --repo_set must be specified") if repo.blank? && repo_set.blank?
 
-      if repo_set
+      if repo_set.present?
         repos = MultiRepo::RepoSet[repo_set]&.deep_dup
         Optimist.die(:repo_set, "#{repo_set.inspect} was not found in the config") if repos.nil?
 
-        if repo
-          repo_names = Set.new(Array(repo))
+        if repo.any?
+          repo_names = Set.new(repo)
           repos.select! { |r| repo_names.include?(r.name) }
         end
 
@@ -30,7 +32,7 @@ module MultiRepo
 
         repos
       else
-        Array(repo).map { |n| MultiRepo::Repo.new(n, dry_run: dry_run) }
+        repo.map { |n| MultiRepo::Repo.new(n, dry_run: dry_run) }
       end
     end
 
@@ -53,7 +55,7 @@ module MultiRepo
         msg = "Individual repo(s) to work with"
         if subset.include?(:repo_set)
           sub_opts = {}
-          msg << "; Overrides --repo-set"
+          msg << " from the --repo-set"
         else
           sub_opts = {:required => true}
         end
