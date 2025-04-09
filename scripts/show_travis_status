@@ -5,6 +5,7 @@ gemfile do
   source "https://rubygems.org"
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
   gem "action_view"
+  gem "travis"
 end
 
 require 'more_core_extensions/core_ext/array/tableize'
