@@ -1,6 +1,9 @@
 require 'pathname'
 require 'pp'
 
+require 'logger'
+require 'active_support'
+
 require 'multi_repo/version'
 
 require 'multi_repo/labels'
