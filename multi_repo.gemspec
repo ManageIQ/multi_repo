@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activesupport"
   spec.add_runtime_dependency "colorize"
   spec.add_runtime_dependency "config"
-  spec.add_runtime_dependency "json", "~> 2.9.1" # Pin json due to https://github.com/ruby/json/issues/752
   spec.add_runtime_dependency "licensee"
   spec.add_runtime_dependency "minigit"
   spec.add_runtime_dependency "more_core_extensions"
@@ -35,7 +34,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "psych", ">=3"
   spec.add_runtime_dependency "rbnacl"
   spec.add_runtime_dependency "rest-client"
-  spec.add_runtime_dependency "travis"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "manageiq-style", ">= 1.5.4"

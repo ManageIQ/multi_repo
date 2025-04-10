@@ -4,6 +4,7 @@ require "bundler/inline"
 gemfile do
   source "https://rubygems.org"
   gem "multi_repo", require: "multi_repo/cli", path: File.expand_path("..", __dir__)
+  gem "travis"
 end
 require 'travis'
 require 'travis/pro/auto_login'

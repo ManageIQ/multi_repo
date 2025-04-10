@@ -16,7 +16,6 @@ require 'multi_repo/service/docker'
 require 'multi_repo/service/git'
 require 'multi_repo/service/github'
 require 'multi_repo/service/rubygems_stub'
-require 'multi_repo/service/travis'
 
 require 'multi_repo/helpers/git_mirror'
 require 'multi_repo/helpers/license'
