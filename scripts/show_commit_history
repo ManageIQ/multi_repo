@@ -7,8 +7,9 @@ gemfile do
 end
 require "active_support/core_ext/object/blank"
 require "active_support/core_ext/string/inflections"
+require "more_core_extensions/core_ext/hash/deletes"
 
-DISPLAY_FORMATS = %w[commit pr-title pr-label]
+DISPLAY_FORMATS = %w[commit pr-title pr-label pr-changelog]
 
 opts = Optimist.options do
   synopsis "Show the git commit log between two refs for all git repos."
@@ -33,30 +34,32 @@ repos_with_changes = []
 MultiRepo::CLI.repos_for(**opts).each do |repo|
   next if opts[:skip].include?(repo.name)
 
-  puts MultiRepo::CLI.header(repo.name)
+  puts MultiRepo::CLI.header(repo.name) unless opts[:display] == "pr-changelog"
   repo.git.fetch(output: false)
 
   case opts[:display]
-  when "pr-label", "pr-title"
+  when "pr-label", "pr-title", "pr-changelog"
     github ||= MultiRepo::Service::Github.client
-    pr_label_display = opts[:display] == "pr-label"
 
     results = {}
-    if pr_label_display
-      results["bug"] = []
-      results["enhancement"] = []
+    if %w[pr-label pr-changelog].include?(opts[:display])
+      results["bug"] = Set.new
+      results["enhancement"] = Set.new
     end
-    results["other"] = []
+    results["other"] = Set.new
 
     log =
       begin
         repo.git.client.capturing.log({:oneline => true}, range)
       rescue MiniGit::GitError
-        puts "ERROR: commit range not found.".light_red
-        puts
+        unless opts[:display] == "pr-changelog"
+          puts "ERROR: commit range not found.".light_red
+          puts
+        end
         next
       end
 
+    pr_index = {}
     log.lines.each do |line|
       next unless (match = line.match(/Merge pull request #(\d+)\b/))
 
@@ -66,23 +69,31 @@ MultiRepo::CLI.repos_for(**opts).each do |repo|
         rescue Octokit::NotFound
           next # PR not found could mean this was a cherry-pick from a different repo, so the PR doesn't exist.
         end
+
+      pr_index[pr.number] = pr
       label = pr.labels.detect { |l| results.key?(l.name) }&.name || "other"
-      results[label] << pr
+      results[label] << pr.number
+    end
+    results.delete_blanks
+
+    if results.present? && opts[:display] == "pr-changelog"
+      puts "\n## <i class=\"fa-brands fa-github\"></i> [#{repo.name}](https://github.com/#{repo.name}/compare/#{opts[:from]}...#{opts[:to]})"
     end
 
-    changes_found = false
-
-    results.each do |label, prs|
-      next if prs.blank?
-      changes_found = true
-
-      puts "\n## #{label.titleize}\n\n" if pr_label_display
-      prs.each do |pr|
+    results.each do |label, pr_numbers|
+      case opts[:display]
+      when "pr-label"
+        puts "\n## #{label.titleize}\n\n"
+      when "pr-changelog"
+        puts "\n### #{label.titleize}\n\n"
+      end
+      pr_numbers.each do |pr_number|
+        pr = pr_index[pr_number]
         puts "* #{pr.title} [[##{pr.number}]](#{pr.html_url})"
       end
     end
 
-    repos_with_changes << repo if changes_found
+    repos_with_changes << repo if results.present?
   when "commit"
     output =
       begin
