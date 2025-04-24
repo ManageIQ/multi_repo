@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-04-24
+### Added
+- Allow blank overrides on the command line [[#46](https://github.com/ManageIQ/multi_repo/pull/46)]
+
+### Removed
+- **BREAKING**: Remove travis gem dependency and service helper [[#48](https://github.com/ManageIQ/multi_repo/pull/48)]
+
 ## [0.6.0] - 2025-02-27
 ### Added
 - [pull_request_blaster_outer] Option to force creation of the pull request without asking [[#40](https://github.com/ManageIQ/multi_repo/pull/40)]
@@ -44,8 +51,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [show_commit_history] Prevent missing ranges from failing the entire run [[#20](https://github.com/ManageIQ/multi_repo/pull/20)]
 - [pull_request_merger] Fixing issue passing kwargs on Ruby 3 [[#23](https://github.com/ManageIQ/multi_repo/pull/23)]
 
-[Unreleased]: https://github.com/ManageIQ/more_core_extensions/compare/v0.5.1...HEAD
-[0.5.1]: https://github.com/ManageIQ/more_core_extensions/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/ManageIQ/more_core_extensions/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/ManageIQ/more_core_extensions/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/ManageIQ/more_core_extensions/compare/v0.3.0...v0.3.1
+[Unreleased]: https://github.com/ManageIQ/multi_repo/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ManageIQ/multi_repo/compare/v0.6.0...v1.0.0
+[0.6.0]: https://github.com/ManageIQ/multi_repo/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/ManageIQ/multi_repo/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/ManageIQ/multi_repo/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/ManageIQ/multi_repo/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/ManageIQ/multi_repo/compare/v0.3.0...v0.3.1
