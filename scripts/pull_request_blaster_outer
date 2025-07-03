@@ -16,6 +16,7 @@ opts = Optimist.options do
   opt :script,  "The path to the script that will update the desired files.", :type => :string, :required => true
   opt :message, "The commit message for this change.",                        :type => :string, :required => true
   opt :title,   "The PR title for this change. (default is --message)",       :type => :string
+  opt :body,    "The PR body for this change. (default is --message)",        :type => :string
 
   opt :force,   "Force creation of the pull request without asking.", :default => false
 
