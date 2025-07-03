@@ -2,9 +2,9 @@ require 'pathname'
 
 module MultiRepo::Helpers
   class PullRequestBlasterOuter
-    attr_reader :repo, :base, :head, :script, :dry_run, :message, :title, :force
+    attr_reader :repo, :base, :head, :script, :dry_run, :message, :title, :body, :force
 
-    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, force: false, **)
+    def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, body: nil, force: false, **)
       @repo    = repo
       @base    = base
       @head    = head
@@ -16,6 +16,7 @@ module MultiRepo::Helpers
       @dry_run = dry_run
       @message = message
       @title   = (title || message)[0, 72]
+      @body    = (body || message).gsub("\\n", "\n")
       @force   = force
     end
 
@@ -41,7 +42,12 @@ module MultiRepo::Helpers
         puts
 
         if dry_run
-          puts "** dry-run: Skipping opening pull request".light_black
+          puts "** dry-run: Skipping opening pull request. The pull request would look like:".light_black
+          puts
+          puts title.light_black
+          puts
+          puts body.light_black
+
           result = "dry run".light_black
         else
           answer =
@@ -134,7 +140,7 @@ module MultiRepo::Helpers
     end
 
     def open_pull_request
-      pr = github.client.create_pull_request(repo.name, base, pr_head, title, title)
+      pr = github.client.create_pull_request(repo.name, base, pr_head, title, body)
       pr.html_url
     rescue => err
       raise unless err.message.include?("A pull request already exists")
