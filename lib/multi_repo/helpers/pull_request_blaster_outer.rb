@@ -112,7 +112,11 @@ module MultiRepo::Helpers
     end
 
     def show_commit
-      repo.git.client.show
+      if force
+        repo.git.raw("--no-pager", "show")
+      else
+        repo.git.client.show
+      end
     end
 
     def blast_remote
