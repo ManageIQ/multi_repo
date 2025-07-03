@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activesupport"
   spec.add_runtime_dependency "colorize"
   spec.add_runtime_dependency "config"
-  spec.add_runtime_dependency "licensee"
+  spec.add_runtime_dependency "licensee", ">= 9.7.0"
   spec.add_runtime_dependency "minigit"
   spec.add_runtime_dependency "more_core_extensions"
   spec.add_runtime_dependency "octokit", ">= 7.0.0"
