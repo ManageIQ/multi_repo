@@ -18,16 +18,19 @@ module MultiRepo::Service
       retry
     end
 
-    def self.clone(clone_source:, path:)
+    def self.raw(*args, quiet: false)
       require "minigit"
       require "shellwords"
 
-      args = ["clone", clone_source, path]
       command = Shellwords.join(["git", *args])
-      command << " &>/dev/null" unless ENV["GIT_DEBUG"]
+      command << " &>/dev/null" if quiet && !ENV["GIT_DEBUG"]
       puts "+ #{command}" if ENV["GIT_DEBUG"] # Matches the output of MiniGit
 
       raise MiniGit::GitError.new(args, $?) unless system(command)
+    end
+
+    def self.clone(clone_source:, path:)
+      raw("clone", clone_source, path, quiet: true)
     end
 
     attr_reader :dry_run, :client
@@ -37,6 +40,10 @@ module MultiRepo::Service
 
       @dry_run = dry_run
       @client  = self.class.client(path: path, clone_source: clone_source)
+    end
+
+    def raw(*args)
+      Dir.chdir(client.git_dir) { self.class.raw(*args) }
     end
 
     def fetch(output: false)
