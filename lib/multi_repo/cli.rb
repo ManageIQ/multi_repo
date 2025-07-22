@@ -84,11 +84,15 @@ module MultiRepo
 
     def self.progress_bar(total = 100)
       require "progressbar"
-      ProgressBar.create(
+      ProgressBar.create(progress_bar_options(total))
+    end
+
+    def self.progress_bar_options(total = 100)
+      {
         :format => "%j%% |%B| %E",
         :length => HEADER_SIZE,
         :total  => total
-      )
+      }
     end
   end
 end
