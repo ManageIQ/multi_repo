@@ -4,6 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-01
+### Added
+- [show_commit_history] Add pr-changelog display format [[#49](https://github.com/ManageIQ/multi_repo/pull/49)]
+- [pull_request_blaster_outer] Prevent git show paging when using --force [[#53](https://github.com/ManageIQ/multi_repo/pull/53)]
+
+### Changed
+- Update licensee to at least 9.7.0 [[#54](https://github.com/ManageIQ/multi_repo/pull/54)]
+- Separate progress bar options from creation of the progress bar [[#55](https://github.com/ManageIQ/multi_repo/pull/55)]
+
 ## [1.0.0] - 2025-04-24
 ### Added
 - Allow blank overrides on the command line [[#46](https://github.com/ManageIQ/multi_repo/pull/46)]
@@ -51,7 +60,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - [show_commit_history] Prevent missing ranges from failing the entire run [[#20](https://github.com/ManageIQ/multi_repo/pull/20)]
 - [pull_request_merger] Fixing issue passing kwargs on Ruby 3 [[#23](https://github.com/ManageIQ/multi_repo/pull/23)]
 
-[Unreleased]: https://github.com/ManageIQ/multi_repo/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ManageIQ/multi_repo/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ManageIQ/multi_repo/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ManageIQ/multi_repo/compare/v0.6.0...v1.0.0
 [0.6.0]: https://github.com/ManageIQ/multi_repo/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/ManageIQ/multi_repo/compare/v0.5.0...v0.5.1
