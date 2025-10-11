@@ -18,6 +18,7 @@ module MultiRepo::Service
       @api_endpoint = endpoint
     end
 
+    FETCH_ACTIONS=%i[list_repositories list_milestones org_members org_teams team_members workflows get_actions_public_key]
     def self.client
       @client ||= begin
         raise "Missing GitHub API Token" if api_token.nil?
@@ -36,7 +37,8 @@ module MultiRepo::Service
           Octokit.middleware = middleware
         end
 
-        Octokit::Client.new(params)
+        c = Octokit::Client.new(params)
+        dry_run ? DryRunner.new(c, "github", FETCH_ACTIONS) : c
       end
     end
 
@@ -129,164 +131,92 @@ module MultiRepo::Service
              :to => :class
 
     def edit_repository(repo_name, settings)
-      if dry_run
-        puts "** dry-run: github.edit_repository(#{repo_name.inspect}, #{settings.inspect[1..-2]})".light_black
-      else
-        client.edit_repository(repo_name, settings)
-      end
+      client.edit_repository(repo_name, settings)
     end
 
     def create_label(repo_name, label, color)
-      if dry_run
-        puts "** dry-run: github.add_label(#{repo_name.inspect}, #{label.inspect}, #{color.inspect})".light_black
-      else
-        client.add_label(repo_name, label, color)
-      end
+      client.add_label(repo_name, label, color)
     end
 
     def update_label(repo_name, label, color: nil, name: nil)
       settings = {:color => color, :name => name}.compact
       raise ArgumentError, "one of color or name must be passed" if settings.empty?
 
-      if dry_run
-        puts "** dry-run: github.update_label(#{repo_name.inspect}, #{label.inspect}, #{settings.inspect[1..-2]})".light_black
-      else
-        client.update_label(repo_name, label, settings)
-      end
+      client.update_label(repo_name, label, settings)
     end
 
     def delete_label!(repo_name, label)
-      if dry_run
-        puts "** dry-run: github.delete_label!(#{repo_name.inspect}, #{label.inspect})".light_black
-      else
-        client.delete_label!(repo_name, label)
-      end
+      client.delete_label!(repo_name, label)
     end
 
     def add_labels_to_an_issue(repo_name, issue_number, labels)
       labels = Array(labels)
-      if dry_run
-        puts "** dry-run: github.add_labels_to_an_issue(#{repo_name.inspect}, #{issue_number.inspect}, #{labels.inspect})".light_black
-      else
-        client.add_labels_to_an_issue(repo_name, issue_number, labels)
-      end
+      client.add_labels_to_an_issue(repo_name, issue_number, labels)
     end
 
     def remove_labels_from_an_issue(repo_name, issue_number, labels)
       Array(labels).each do |label|
-        if dry_run
-          puts "** dry-run: github.remove_label(#{repo_name.inspect}, #{issue_number.inspect}, #{label.inspect})".light_black
-        else
-          client.remove_label(repo_name, issue_number, label)
-        end
+        client.remove_label(repo_name, issue_number, label)
       rescue Octokit::NotFound
         # Ignore labels that are not found, because we want them removed anyway
       end
     end
 
     def add_comment(repo_name, issue_number, body)
-      if dry_run
-        puts "** dry-run: github.add_comment(#{repo_name.inspect}, #{issue_number.inspect}, #{body.pretty_inspect.chomp})".light_black
-      else
-        client.add_comment(repo_name, issue_number, body)
-      end
+      client.add_comment(repo_name, issue_number, body)
     end
 
     def assign_user(repo_name, issue_number, assignee)
       assignee = assignee[1..] if assignee.start_with?("@")
-      if dry_run
-        puts "** dry-run: github.update_issue(#{repo_name.inspect}, #{issue_number.inspect}, \"assignee\" => #{assignee.inspect})".light_black
-      else
-        client.update_issue(repo_name, issue_number, "assignee" => assignee)
-      end
+      client.update_issue(repo_name, issue_number, "assignee" => assignee)
     end
 
     def create_milestone(repo_name, title, due_on)
-      if dry_run
-        puts "** dry-run: github.create_milestone(#{repo_name.inspect}, #{title.inspect}, :due_on => #{due_on.strftime("%Y-%m-%d").inspect})".light_black
-      else
-        client.create_milestone(repo_name, title, :due_on => due_on)
-      end
+      client.create_milestone(repo_name, title, :due_on => due_on)
     end
 
     def update_milestone(repo_name, milestone_number, due_on)
-      if dry_run
-        puts "** dry-run: github.update_milestone(#{repo_name.inspect}, #{milestone_number}, :due_on => #{due_on.strftime("%Y-%m-%d").inspect})".light_black
-      else
-        client.update_milestone(repo_name, milestone_number, :due_on => due_on)
-      end
+      client.update_milestone(repo_name, milestone_number, :due_on => due_on)
     end
 
     def close_milestone(repo_name, milestone_number)
-      if dry_run
-        puts "** dry-run: github.update_milestone(#{repo_name.inspect}, #{milestone_number}, :state => 'closed')".light_black
-      else
-        client.update_milestone(repo_name, milestone_number, :state => "closed")
-      end
+      client.update_milestone(repo_name, milestone_number, :state => "closed")
     end
 
     def protect_branch(repo_name, branch, settings)
-      if dry_run
-        puts "** dry-run: github.protect_branch(#{repo_name.inspect}, #{branch.inspect}, #{settings.inspect[1..-2]})".light_black
-      else
-        client.protect_branch(repo_name, branch, settings)
-      end
+      client.protect_branch(repo_name, branch, settings)
     end
 
     def add_team_membership(org, team, user)
       team_id = team_ids_by_name(org)[team]
 
-      if dry_run
-        puts "** dry-run: github.add_team_membership(#{team_id.inspect}, #{user.inspect})".light_black
-      else
-        client.add_team_membership(team_id, user)
-      end
+      client.add_team_membership(team_id, user)
     end
 
     def remove_team_membership(org, team, user)
       team_id = team_ids_by_name(org)[team]
 
-      if dry_run
-        puts "** dry-run: github.remove_team_membership(#{team_id.inspect}, #{user.inspect})".light_black
-      else
-        client.remove_team_membership(team_id, user)
-      end
+      client.remove_team_membership(team_id, user)
     end
 
     def remove_collaborator(repo_name, user)
-      if dry_run
-        puts "** dry-run: github.remove_collaborator(#{repo_name.inspect}, #{user.inspect})".light_black
-      else
-        client.remove_collaborator(repo_name, user)
-      end
+      client.remove_collaborator(repo_name, user)
     end
 
     def enable_workflow(repo_name, workflow_number)
       command = "repos/#{repo_name}/actions/workflows/#{workflow_number}/enable"
 
-      if dry_run
-        puts "** dry-run: github.put(#{command.inspect})".light_black
-      else
-        client.put(command)
-      end
+      client.put(command)
     end
 
     def merge_pull_request(repo_name, pr_number)
-      if dry_run
-        puts "** dry-run: github.merge_pull_request(#{repo_name.inspect}, #{pr_number.inspect})".light_black
-      else
-        client.merge_pull_request(repo_name, pr_number)
-      end
+      client.merge_pull_request(repo_name, pr_number)
     end
 
     def create_or_update_repository_secret(repo_name, key, value)
       payload = encode_secret(repo_name, value)
 
-      if dry_run
-        puts "** dry-run: github.create_or_update_actions_secret(#{repo_name.inspect}, #{key.inspect}, #{payload.inspect})".light_black
-      else
-        client.create_or_update_actions_secret(repo_name, key, payload)
-      end
+      client.create_or_update_actions_secret(repo_name, key, payload)
     end
 
     private def encode_secret(repo_name, value)
