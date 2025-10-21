@@ -19,7 +19,7 @@ gem install multi_repo
 Typical usage will be from single scripts. In order to keep each script manageable, it can be preferable to use bundler/inline to define the gems needed by that script. To do this, add the following to the top of the script:
 
 ```ruby
-#/usr/bin/env ruby
+#!/usr/bin/env ruby
 
 require "bundler/inline"
 gemfile do
@@ -69,7 +69,7 @@ purposes
 - Go to https://github.com/settings/tokens
 - Choose "Generate New Token"
 - Give the token a description
-- At a mimimum, choose "repo" for the permissions.
+- At a minimum, choose "repo" for the permissions.
 - Click "Generate Token"
 - Copy the token given to you, and keep it in a safe location, as once you leave
   the page, the token is no longer accessible

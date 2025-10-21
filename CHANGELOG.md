@@ -44,7 +44,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - [pull_request_labeler] Fix cli description of --prs [[#30](https://github.com/ManageIQ/multi_repo/pull/30)]
-- [show_commit_history] Handle issue where PR may not be found [[#36](https://github.com/ManageIQ/multi_repo/pull/30)]
+- [show_commit_history] Handle issue where PR may not be found [[#36](https://github.com/ManageIQ/multi_repo/pull/36)]
 
 ## [0.4.0] - 2024-03-29
 ### Changed
