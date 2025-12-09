@@ -4,7 +4,6 @@ MultiRepo is a tool for managing multiple git repositories.
 
 [![Gem Version](https://badge.fury.io/rb/multi_repo.svg)](http://badge.fury.io/rb/multi_repo)
 [![CI](https://github.com/ManageIQ/multi_repo/actions/workflows/ci.yaml/badge.svg)](https://github.com/ManageIQ/multi_repo/actions/workflows/ci.yaml)
-[![Code Climate](https://codeclimate.com/github/ManageIQ/multi_repo.svg)](https://codeclimate.com/github/ManageIQ/multi_repo)
 
 ## Installation
 
