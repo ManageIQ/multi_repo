@@ -2,7 +2,7 @@ require 'pathname'
 
 module MultiRepo::Helpers
   class PullRequestBlasterOuter
-    attr_reader :repo, :base, :head, :script, :dry_run, :message, :title, :body, :force
+    attr_reader :repo, :base, :head, :script, :dry_run, :source_message, :source_title, :source_body, :force
 
     def initialize(repo, base:, head:, script:, dry_run:, message:, title: nil, body: nil, force: false, **)
       @repo    = repo
@@ -14,10 +14,11 @@ module MultiRepo::Helpers
         s.to_s
       end
       @dry_run = dry_run
-      @message = message
-      @title   = (title || message)[0, 72]
-      @body    = (body || message).gsub("\\n", "\n")
       @force   = force
+
+      @source_message = message&.gsub("\\n", "\n")
+      @source_title   = title
+      @source_body    = body&.gsub("\\n", "\n")
     end
 
     def blast
@@ -44,8 +45,10 @@ module MultiRepo::Helpers
         if dry_run
           puts "** dry-run: Skipping opening pull request. The pull request would look like:".light_black
           puts
+          puts "Pull Request Title:".light_black
           puts title.light_black
           puts
+          puts "Pull Request Body:".light_black
           puts body.light_black
 
           result = "dry run".light_black
@@ -73,6 +76,20 @@ module MultiRepo::Helpers
 
     private
 
+    attr_accessor :override_message
+
+    def message
+      override_message || source_message
+    end
+
+    def title
+      source_title || message.lines.first.chomp[0, 72]
+    end
+
+    def body
+      source_body || message.lines.drop(1).join.strip
+    end
+
     def github
       @github ||= MultiRepo::Service::Github.new(dry_run: dry_run)
     end
@@ -94,6 +111,10 @@ module MultiRepo::Helpers
     def run_script
       repo.chdir do
         Bundler.with_unbundled_env do
+          # Ensure any previous override commit message is removed
+          FileUtils.rm_f(".git/COMMIT_EDITMSG")
+          self.override_message = nil
+
           parts = []
           parts << "GITHUB_REPO=#{repo.name}"
           parts << "DRY_RUN=true" if dry_run
@@ -103,6 +124,10 @@ module MultiRepo::Helpers
           unless system(cmd)
             puts "!! Script execution failed.".light_red
             exit $?.exitstatus
+          end
+
+          if File.exist?(".git/COMMIT_EDITMSG")
+            self.override_message = File.read(".git/COMMIT_EDITMSG")
           end
         end
       end
