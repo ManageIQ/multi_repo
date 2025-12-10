@@ -11,7 +11,6 @@ require 'multi_repo/repo'
 require 'multi_repo/repo_set'
 
 require 'multi_repo/service/artifactory'
-require 'multi_repo/service/code_climate'
 require 'multi_repo/service/docker'
 require 'multi_repo/service/git'
 require 'multi_repo/service/github'
