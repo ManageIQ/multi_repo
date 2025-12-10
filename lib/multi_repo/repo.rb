@@ -27,6 +27,14 @@ module MultiRepo
       name.split("/").last
     end
 
+    def fork_name
+      config.fork_name
+    end
+
+    def fork_short_name
+      fork_name&.split("/")&.last || short_name
+    end
+
     def write_file(file, content, **kwargs)
       if dry_run
         puts "** dry-run: Writing #{path.join(file).expand_path}".light_black
