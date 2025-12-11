@@ -19,7 +19,9 @@ MultiRepo::CLI.each_repo(**opts) do |repo|
   repo.git.fetch
   repo.git.hard_checkout(opts[:ref])
   repo.chdir do
-    puts "+ #{opts[:command]}".light_black
-    system(opts[:command])
+    Bundler.with_unbundled_env do
+      puts "+ #{opts[:command]}".light_black
+      system(opts[:command])
+    end
   end
 end
