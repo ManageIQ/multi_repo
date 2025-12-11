@@ -94,15 +94,13 @@ module MultiRepo::Helpers
       @github ||= MultiRepo::Service::Github.new(dry_run: dry_run)
     end
 
-    def forked?
-      # NOTE: There is an assumption here that the fork's name will match the source's name.
-      #   Ideally there would be a "forked from" field in the repo metadata, but there isn't.
-      github.client.repos(github.client.login, :type => "forks").any? { |m| m.name == repo.short_name }
+    def forked?(cache: true)
+      github.forks(cache: cache).any? { |f| f.name == repo.fork_short_name }
     end
 
     def fork_repo
       github.client.fork(repo.name)
-      until forked?
+      until forked?(cache: false)
         print "."
         sleep 3
       end

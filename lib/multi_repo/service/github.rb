@@ -90,6 +90,11 @@ module MultiRepo::Service
       client.workflows(repo_name)[:workflows].select { |w| w.state == "disabled_inactivity" }
     end
 
+    def self.forks(cache: true)
+      @forks = nil unless cache
+      @forks ||= client.repos(client.login, :type => "forks")
+    end
+
     PR_REGEX = %r{^([^/#]+/[^/#]+)#(\d+)$}
 
     # Parse a list of PRs that are in URL or org/repo#pr format into a Array of
@@ -125,6 +130,7 @@ module MultiRepo::Service
              :team_member_names,
              :team_ids_by_name,
              :team_names,
+             :forks,
              :disabled_workflows,
              :to => :class
 
