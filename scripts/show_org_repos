@@ -10,6 +10,9 @@ opts = Optimist.options do
   synopsis "List all repos in an org."
 
   opt :org, "The org to list the repos for", :type => :string, :required => true
+
+  opt :include_forks, "Include forked repos", :default => false
+  opt :include_archived, "Include archived repos", :default => false
 end
 
-puts MultiRepo::Service::Github.org_repo_names(opts[:org])
+puts MultiRepo::Service::Github.org_repo_names(opts[:org], **opts.slice(:include_forks, :include_archived))
