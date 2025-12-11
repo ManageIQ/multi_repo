@@ -14,13 +14,25 @@ opts = Optimist.options do
   opt :base,    "The target branch for the changes.",                         :type => :string, :required => true
   opt :head,    "The name of the branch to create on your fork.",             :type => :string, :required => true
   opt :script,  "The path to the script that will update the desired files.", :type => :string, :required => true
-  opt :message, "The commit message for this change.",                        :type => :string, :required => true
-  opt :title,   "The PR title for this change. (default is --message)",       :type => :string
-  opt :body,    "The PR body for this change. (default is --message)",        :type => :string
+  opt :force,   "Force creation of the pull request without asking.",         :default => false
 
-  opt :force,   "Force creation of the pull request without asking.", :default => false
+  see_below = "See \"Notes on commit messages\" section below."
+  opt :message, "The commit message for this change. #{see_below}", :type => :string, :required => true
+  opt :title,   "The PR title for this change. #{see_below}",       :type => :string
+  opt :body,    "The PR body for this change. #{see_below}",        :type => :string
 
   MultiRepo::CLI.common_options(self)
+  opt :help, "Show this message" # Ensure help appears above the notes sections
+
+  banner ""
+  banner <<~EOS
+    Notes on commit messages:
+      * The --message and --body options can accept '\\n' characters to support multiline messages.
+      * In a script, you can override --message by writing the commit message contents to .git/COMMIT_EDITMSG.
+      * The --title will default to the first line of the message.
+      * The --body will default to the rest of the message.
+      * If you want to override the title or body, you can do so with the --title and --body options, respectively.
+  EOS
 end
 
 results = {}
