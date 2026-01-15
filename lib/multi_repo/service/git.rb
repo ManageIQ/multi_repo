@@ -49,7 +49,7 @@ module MultiRepo::Service
     def fetch(output: false)
       client = output ? self.client : self.client.capturing
 
-      client.fetch(:all => true, :tags => true)
+      client.fetch(:all => true, :tags => true, :force => true)
     end
 
     def hard_checkout(branch, source = "origin/#{branch}", output: false)
